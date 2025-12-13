@@ -70,13 +70,11 @@ function sortirSac(index) {
   }
 }
 
-<script>
 function afficher(){
   tableStock.innerHTML="";
   historique.innerHTML="";
   const now=new Date();
 
-  // TRI FIFO (date la plus ancienne d'abord, les sans date à la fin)
   stock.sort((a,b)=>{
     if(!a.date) return 1;
     if(!b.date) return -1;
@@ -104,9 +102,7 @@ function afficher(){
       <td>${dateAff}</td>
       <td>${x.sacs}</td>
       <td>
-        <button onclick="confirmerSortie(${i})" ${x.sacs===0?"disabled":""}>
-          -1 sac
-        </button>
+        <button onclick="confirmerSortie(${i})" ${x.sacs===0?"disabled":""}>-1 sac</button>
       </td>
     </tr>`;
   });
@@ -119,7 +115,6 @@ function confirmerSortie(i){
     sortirSac(i);
   }
 }
-</script>
 
 </body>
 </html>
