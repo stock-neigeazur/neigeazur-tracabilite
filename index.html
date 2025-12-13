@@ -40,6 +40,9 @@ button { cursor: pointer; }
 
 <h3>Stock actuel</h3>
 
+<button onclick="exportStock()">Exporter le stock (CSV)</button>
+<button onclick="exportHistorique()">Exporter l’historique (CSV)</button>
+
 <table>
 <thead>
 <tr>
@@ -157,6 +160,40 @@ function afficher(){
 }
 
 afficher();
+function exportStock(){
+  let csv = "Matière;Fournisseur;Lot;Type;Date;Sacs restants\n";
+
+  stock.forEach(x => {
+    csv +=
+      x.matiere + ";" +
+      x.fournisseur + ";" +
+      x.lot + ";" +
+      x.type + ";" +
+      (x.date ? x.date.split("-").reverse().join("/") : "") + ";" +
+      x.sacs + "\n";
+  });
+
+  telechargerCSV(csv, "stock_neige_azur.csv");
+}
+
+function exportHistorique(){
+  let csv = "Date;Détail\n";
+
+  hist.forEach(ligne => {
+    csv += ligne + "\n";
+  });
+
+  telechargerCSV(csv, "historique_sorties_neige_azur.csv");
+}
+
+function telechargerCSV(contenu, nomFichier){
+  const blob = new Blob([contenu], { type: "text/csv;charset=utf-8;" });
+  const lien = document.createElement("a");
+  lien.href = URL.createObjectURL(blob);
+  lien.download = nomFichier;
+  lien.click();
+}
+
 </script>
 
 </body>
