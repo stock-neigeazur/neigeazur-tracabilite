@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Neige Azur – Traçabilité MP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 15px; }
+    h1 { color: #003366; }
+    input, button { width: 100%; padding: 8px; margin: 5px 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+    .ok { background: #c8f7c5; }
+    .soon { background: #fff3cd; }
+    .expired { background: #f8d7da; }
+  </style>
+</head>
+<body>
+
+<h1>Traçabilité matières premières – Neige Azur</h1>
+
+<h3>Ajouter un lot</h3>
+<input id="matiere" placeholder="Matière première">
+<input id="fournisseur" placeholder="Fournisseur">
+<input id="lot" placeholder="Numéro de lot">
+<input id="dlc" type="date">
+<input id="quantite" type="number" placeholder="Nombre de sacs">
+
+<button onclick="ajouterLot()">Ajouter</button>
+
+<h3>Stock actuel</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Matière</th>
+      <th>Lot</th>
+      <th>DLC/DLUO</th>
+      <th>Sacs restants</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="tableStock"></tbody>
+</table>
+
+<script>
+let stock = JSON.parse(localStorage.getItem("stock")) || [];
+
+function sauver() {
+  localStorage.setItem("stock", JSON.stringify(stock));
+}
+
+function ajouterLot() {
+  stock.push({
+    matiere: matiere.value,
+    fournisseur: fournisseur.value,
+    lot: lot.value,
+    dlc: dlc.value,
+    sacs: Number(quantite.value)
+  });
+  sauver();
+  afficher();
+}
+
+function sortirSac(index) {
+  if (stock[index].sacs > 0) {
+    stock[index].sacs--;
+    sauver();
+    afficher();
+  }
+}
+
+function afficher() {
+  tableStock.innerHTML = "";
+  const today = new Date();
+
+  stock.forEach((item, i) => {
+    const dateLot = new Date(item.dlc);
+    const diff = (dateLot - today) / (1000 * 3600 * 24);
+    let classe = diff < 0 ? "expired" : diff < 30 ? "soon" : "ok";
+
+    tableStock.innerHTML += `
+      <tr class="${classe}">
+        <td>${item.matiere}</td>
+        <td>${item.lot}</td>
+        <td>${item.dlc.split("-").reverse().join("/")}</td>
+        <td>${item.sacs}</td>
+        <td><button onclick="sortirSac(${i})">-1 sac</button></td>
+      </tr>`;
+  });
+}
+
+afficher();
+</script>
+
+</body>
+</html>
