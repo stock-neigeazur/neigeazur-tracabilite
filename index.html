@@ -30,16 +30,17 @@
 
 <h3>Stock actuel</h3>
 <table>
-  <thead>
-    <tr>
-      <th>Matière</th>
-      <th>Lot</th>
-      <th>DLC/DLUO</th>
-      <th>Sacs restants</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody id="tableStock"></tbody>
+<thead>
+<tr>
+<th>Matière</th>
+<th>Fournisseur</th>
+<th>Lot</th>
+<th>DLC / DLUO</th>
+<th>Sacs restants</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="tableStock"></tbody>
 </table>
 
 <script>
@@ -69,27 +70,55 @@ function sortirSac(index) {
   }
 }
 
-function afficher() {
-  tableStock.innerHTML = "";
-  const today = new Date();
+<script>
+function afficher(){
+  tableStock.innerHTML="";
+  historique.innerHTML="";
+  const now=new Date();
 
-  stock.forEach((item, i) => {
-    const dateLot = new Date(item.dlc);
-    const diff = (dateLot - today) / (1000 * 3600 * 24);
-    let classe = diff < 0 ? "expired" : diff < 30 ? "soon" : "ok";
-
-    tableStock.innerHTML += `
-      <tr class="${classe}">
-        <td>${item.matiere}</td>
-        <td>${item.lot}</td>
-        <td>${item.dlc.split("-").reverse().join("/")}</td>
-        <td>${item.sacs}</td>
-        <td><button onclick="sortirSac(${i})">-1 sac</button></td>
-      </tr>`;
+  // TRI FIFO (date la plus ancienne d'abord, les sans date à la fin)
+  stock.sort((a,b)=>{
+    if(!a.date) return 1;
+    if(!b.date) return -1;
+    return new Date(a.date)-new Date(b.date);
   });
+
+  stock.forEach((x,i)=>{
+    let classe="ok";
+    let dateAff="—";
+
+    if(x.date){
+      const d=new Date(x.date);
+      const diff=(d-now)/86400000;
+      dateAff=x.date.split("-").reverse().join("/");
+
+      if(diff<0) classe="expired";
+      else if(diff<(x.type==="DLC"?15:30)) classe="soon";
+    }
+
+    tableStock.innerHTML+=`
+    <tr class="${classe}">
+      <td>${x.matiere}</td>
+      <td>${x.fournisseur}</td>
+      <td>${x.lot}</td>
+      <td>${dateAff}</td>
+      <td>${x.sacs}</td>
+      <td>
+        <button onclick="confirmerSortie(${i})" ${x.sacs===0?"disabled":""}>
+          -1 sac
+        </button>
+      </td>
+    </tr>`;
+  });
+
+  hist.forEach(h=>historique.innerHTML+=`<li>${h}</li>`);
 }
 
-afficher();
+function confirmerSortie(i){
+  if(confirm("Confirmer la sortie d’un sac ?")){
+    sortirSac(i);
+  }
+}
 </script>
 
 </body>
