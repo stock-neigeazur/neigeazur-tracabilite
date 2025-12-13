@@ -1,34 +1,45 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Neige Azur – Traçabilité MP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial, sans-serif; padding: 15px; }
-    h1 { color: #003366; }
-    input, button { width: 100%; padding: 8px; margin: 5px 0; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
-    .ok { background: #c8f7c5; }
-    .soon { background: #fff3cd; }
-    .expired { background: #f8d7da; }
-  </style>
+<meta charset="UTF-8">
+<title>Traçabilité matières premières – Neige Azur</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body { font-family: Arial, sans-serif; padding: 15px; }
+h1 { color: #003366; }
+input, select, button { width: 100%; padding: 8px; margin: 6px 0; }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+.ok { background: #d4edda; }
+.soon { background: #fff3cd; }
+.expired { background: #f8d7da; }
+button { cursor: pointer; }
+</style>
 </head>
+
 <body>
 
 <h1>Traçabilité matières premières – Neige Azur</h1>
 
 <h3>Ajouter un lot</h3>
+
 <input id="matiere" placeholder="Matière première">
 <input id="fournisseur" placeholder="Fournisseur">
 <input id="lot" placeholder="Numéro de lot">
+
+<select id="type">
+  <option value="DLUO">DLUO</option>
+  <option value="DLC">DLC</option>
+</select>
+
 <input id="dlc" type="date">
 <input id="quantite" type="number" placeholder="Nombre de sacs">
 
 <button onclick="ajouterLot()">Ajouter</button>
 
 <h3>Stock actuel</h3>
+
 <table>
 <thead>
 <tr>
@@ -43,78 +54,110 @@
 <tbody id="tableStock"></tbody>
 </table>
 
+<h3>Historique des sorties</h3>
+<ul id="historique"></ul>
+
 <script>
 let stock = JSON.parse(localStorage.getItem("stock")) || [];
+let hist = JSON.parse(localStorage.getItem("hist")) || [];
 
-function sauver() {
+function save(){
   localStorage.setItem("stock", JSON.stringify(stock));
+  localStorage.setItem("hist", JSON.stringify(hist));
 }
 
-function ajouterLot() {
+function ajouterLot(){
+
+  if(!matiere.value || !lot.value || !quantite.value){
+    alert("Merci de renseigner au minimum : matière, lot et nombre de sacs.");
+    return;
+  }
+
   stock.push({
-    matiere: matiere.value,
-    fournisseur: fournisseur.value,
-    lot: lot.value,
-    dlc: dlc.value,
+    matiere: matiere.value.trim(),
+    fournisseur: fournisseur.value.trim() || "—",
+    lot: lot.value.trim(),
+    type: type.value,
+    date: dlc.value || "",
     sacs: Number(quantite.value)
   });
-  sauver();
+
+  save();
   afficher();
+
+  matiere.value = "";
+  fournisseur.value = "";
+  lot.value = "";
+  dlc.value = "";
+  quantite.value = "";
 }
 
-function sortirSac(index) {
-  if (stock[index].sacs > 0) {
+function sortirSac(index){
+  if(stock[index].sacs > 0){
     stock[index].sacs--;
-    sauver();
+    hist.unshift(
+      new Date().toLocaleDateString() +
+      " : 1 sac " +
+      stock[index].matiere +
+      " (lot " + stock[index].lot + ")"
+    );
+    save();
     afficher();
   }
 }
 
-function afficher(){
-  tableStock.innerHTML="";
-  historique.innerHTML="";
-  const now=new Date();
+function confirmerSortie(index){
+  if(confirm("Confirmer la sortie d’un sac ?")){
+    sortirSac(index);
+  }
+}
 
+function afficher(){
+  tableStock.innerHTML = "";
+  historique.innerHTML = "";
+  const now = new Date();
+
+  // FIFO : date la plus ancienne d'abord, sans date à la fin
   stock.sort((a,b)=>{
     if(!a.date) return 1;
     if(!b.date) return -1;
-    return new Date(a.date)-new Date(b.date);
+    return new Date(a.date) - new Date(b.date);
   });
 
   stock.forEach((x,i)=>{
-    let classe="ok";
-    let dateAff="—";
+    let classe = "ok";
+    let dateAff = "—";
 
     if(x.date){
-      const d=new Date(x.date);
-      const diff=(d-now)/86400000;
-      dateAff=x.date.split("-").reverse().join("/");
+      const d = new Date(x.date);
+      const diff = (d - now) / 86400000;
+      dateAff = x.date.split("-").reverse().join("/");
 
-      if(diff<0) classe="expired";
-      else if(diff<(x.type==="DLC"?15:30)) classe="soon";
+      if(diff < 0) classe = "expired";
+      else if(diff < (x.type === "DLC" ? 15 : 30)) classe = "soon";
     }
 
-    tableStock.innerHTML+=`
-    <tr class="${classe}">
-      <td>${x.matiere}</td>
-      <td>${x.fournisseur}</td>
-      <td>${x.lot}</td>
-      <td>${dateAff}</td>
-      <td>${x.sacs}</td>
-      <td>
-        <button onclick="confirmerSortie(${i})" ${x.sacs===0?"disabled":""}>-1 sac</button>
-      </td>
-    </tr>`;
+    tableStock.innerHTML += `
+      <tr class="${classe}">
+        <td>${x.matiere}</td>
+        <td>${x.fournisseur}</td>
+        <td>${x.lot}</td>
+        <td>${dateAff}</td>
+        <td>${x.sacs}</td>
+        <td>
+          <button onclick="confirmerSortie(${i})" ${x.sacs === 0 ? "disabled" : ""}>
+            -1 sac
+          </button>
+        </td>
+      </tr>
+    `;
   });
 
-  hist.forEach(h=>historique.innerHTML+=`<li>${h}</li>`);
+  hist.forEach(h => historique.innerHTML += `<li>${h}</li>`);
 }
 
-function confirmerSortie(i){
-  if(confirm("Confirmer la sortie d’un sac ?")){
-    sortirSac(i);
-  }
-}
+afficher();
+</script>
 
 </body>
 </html>
