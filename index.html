@@ -2,25 +2,70 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Traçabilité matières premières – Neige Azur</title>
+<title>Traçabilité matières – Neige Azur</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body { font-family: Arial, sans-serif; padding: 15px; }
 h1 { color: #003366; }
-input, select, button { width: 100%; padding: 8px; margin: 6px 0; }
-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+
+input, select, button {
+  width: 100%;
+  padding: 8px;
+  margin: 6px 0;
+}
+
+button { cursor: pointer; }
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tabs button {
+  flex: 1;
+  background: #e0e0e0;
+  border: none;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.tabs button.active {
+  background: #003366;
+  color: white;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 6px;
+  text-align: center;
+}
+
 .ok { background: #d4edda; }
 .soon { background: #fff3cd; }
 .expired { background: #f8d7da; }
-button { cursor: pointer; }
 </style>
 </head>
 
 <body>
 
-<h1>Traçabilité matières premières – Neige Azur</h1>
+<h1>Traçabilité matières – Neige Azur</h1>
+
+<!-- ONGLET -->
+<div class="tabs">
+  <button id="btn-mp" class="active" onclick="showTab('mp')">Matières premières</button>
+  <button id="btn-ms" onclick="showTab('ms')">Matières secondaires</button>
+</div>
+
+<!-- ================= MATIÈRES PREMIÈRES ================= -->
+<div id="tab-mp">
 
 <h3>Ajouter un lot</h3>
 
@@ -43,6 +88,7 @@ button { cursor: pointer; }
 
   <option value="Autre">Autre (à préciser)</option>
 </select>
+
 <input id="matiereAutre" placeholder="Préciser la matière (si autre)" style="display:none">
 <input id="fournisseur" placeholder="Fournisseur">
 <input id="lot" placeholder="Numéro de lot">
@@ -69,7 +115,7 @@ button { cursor: pointer; }
 <th>Fournisseur</th>
 <th>Lot</th>
 <th>DLC / DLUO</th>
-<th>Sacs restants</th>
+<th>Sacs</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -79,28 +125,43 @@ button { cursor: pointer; }
 <h3>Historique des sorties</h3>
 <ul id="historique"></ul>
 
+</div>
+
+<!-- ================= MATIÈRES SECONDAIRES ================= -->
+<div id="tab-ms" style="display:none;">
+  <h3>Matières secondaires</h3>
+  <p>Module à venir.</p>
+</div>
+
 <script>
 let stock = JSON.parse(localStorage.getItem("stock")) || [];
 let hist = JSON.parse(localStorage.getItem("hist")) || [];
 
+/* ----- ONGLET ----- */
+function showTab(tab){
+  document.getElementById("tab-mp").style.display = tab === "mp" ? "block" : "none";
+  document.getElementById("tab-ms").style.display = tab === "ms" ? "block" : "none";
+
+  document.getElementById("btn-mp").classList.toggle("active", tab === "mp");
+  document.getElementById("btn-ms").classList.toggle("active", tab === "ms");
+}
+
+/* ----- STOCK ----- */
 function save(){
   localStorage.setItem("stock", JSON.stringify(stock));
   localStorage.setItem("hist", JSON.stringify(hist));
 }
 
 function ajouterLot(){
-
-  if(!matiere.value || !lot.value || !quantite.value){
-    alert("Merci de renseigner au minimum : matière, lot et nombre de sacs.");
+  if(!lot.value || !quantite.value){
+    alert("Lot et nombre de sacs obligatoires.");
     return;
   }
 
   stock.push({
-    matiere: matiere.value === "Autre"
-  ? matiereAutre.value
-  : matiere.value,
-    fournisseur: fournisseur.value.trim() || "—",
-    lot: lot.value.trim(),
+    matiere: matiere.value === "Autre" ? matiereAutre.value : matiere.value,
+    fournisseur: fournisseur.value || "—",
+    lot: lot.value,
     type: type.value,
     date: dlc.value || "",
     sacs: Number(quantite.value)
@@ -109,30 +170,20 @@ function ajouterLot(){
   save();
   afficher();
 
-  matiere.value = "";
+  matiereAutre.value = "";
   fournisseur.value = "";
   lot.value = "";
   dlc.value = "";
   quantite.value = "";
 }
 
-function sortirSac(index){
-  if(stock[index].sacs > 0){
-    stock[index].sacs--;
-    hist.unshift(
-      new Date().toLocaleDateString() +
-      " : 1 sac " +
-      stock[index].matiere +
-      " (lot " + stock[index].lot + ")"
-    );
+function sortirSac(i){
+  if(stock[i].sacs > 0){
+    stock[i].sacs--;
+    hist.unshift(new Date().toLocaleDateString() +
+      " : 1 sac " + stock[i].matiere + " (lot " + stock[i].lot + ")");
     save();
     afficher();
-  }
-}
-
-function confirmerSortie(index){
-  if(confirm("Confirmer la sortie d’un sac ?")){
-    sortirSac(index);
   }
 }
 
@@ -141,7 +192,6 @@ function afficher(){
   historique.innerHTML = "";
   const now = new Date();
 
-  // FIFO : date la plus ancienne d'abord, sans date à la fin
   stock.sort((a,b)=>{
     if(!a.date) return 1;
     if(!b.date) return -1;
@@ -156,7 +206,6 @@ function afficher(){
       const d = new Date(x.date);
       const diff = (d - now) / 86400000;
       dateAff = x.date.split("-").reverse().join("/");
-
       if(diff < 0) classe = "expired";
       else if(diff < (x.type === "DLC" ? 15 : 30)) classe = "soon";
     }
@@ -168,57 +217,40 @@ function afficher(){
         <td>${x.lot}</td>
         <td>${dateAff}</td>
         <td>${x.sacs}</td>
-        <td>
-          <button onclick="confirmerSortie(${i})" ${x.sacs === 0 ? "disabled" : ""}>
-            -1 sac
-          </button>
-        </td>
-      </tr>
-    `;
+        <td><button onclick="sortirSac(${i})">-1</button></td>
+      </tr>`;
   });
 
   hist.forEach(h => historique.innerHTML += `<li>${h}</li>`);
 }
 
-afficher();
 function exportStock(){
-  let csv = "Matière;Fournisseur;Lot;Type;Date;Sacs restants\n";
-
-  stock.forEach(x => {
-    csv +=
-      x.matiere + ";" +
-      x.fournisseur + ";" +
-      x.lot + ";" +
-      x.type + ";" +
-      (x.date ? x.date.split("-").reverse().join("/") : "") + ";" +
-      x.sacs + "\n";
+  let csv = "Matière;Fournisseur;Lot;Type;Date;Sacs\n";
+  stock.forEach(x=>{
+    csv += `${x.matiere};${x.fournisseur};${x.lot};${x.type};${x.date};${x.sacs}\n`;
   });
-
-  telechargerCSV(csv, "stock_neige_azur.csv");
+  telechargerCSV(csv,"stock_neige_azur.csv");
 }
 
 function exportHistorique(){
-  let csv = "Date;Détail\n";
-
-  hist.forEach(ligne => {
-    csv += ligne + "\n";
-  });
-
-  telechargerCSV(csv, "historique_sorties_neige_azur.csv");
+  let csv = "Historique\n";
+  hist.forEach(h=>csv+=h+"\n");
+  telechargerCSV(csv,"historique_neige_azur.csv");
 }
 
-function telechargerCSV(contenu, nomFichier){
-  const blob = new Blob([contenu], { type: "text/csv;charset=utf-8;" });
-  const lien = document.createElement("a");
-  lien.href = URL.createObjectURL(blob);
-  lien.download = nomFichier;
-  lien.click();
+function telechargerCSV(c,n){
+  const blob=new Blob([c],{type:"text/csv"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=n;
+  a.click();
 }
 
-matiere.addEventListener("change", () => {
-  matiereAutre.style.display = matiere.value === "Autre" ? "block" : "none";
+matiere.addEventListener("change",()=>{
+  matiereAutre.style.display = matiere.value==="Autre"?"block":"none";
 });
 
+afficher();
 </script>
 
 </body>
