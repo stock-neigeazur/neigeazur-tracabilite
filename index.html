@@ -70,20 +70,19 @@ th, td {
 <h3>Ajouter un lot</h3>
 
 <select id="matiere">
-<optgroup label="Glaces et Sorbets">
-  <option value="Sucre">Sucre</option>
-  <option value="Sucre inverti">Sucre inverti</option>
-  <option value="Dextrose">Dextrose</option>
-  <option value="Glucose">Glucose</option>
-  <option value="Huile de coco">Huile de coco</option>
-  <option value="Lait entier">Lait entier</option>
-  <option value="Crème">Crème</option>
-  <option value="Lait en poudre">Lait en poudre</option>
-  <option value="Stabilisateur glace">Stabilisateur glace</option>
-  <option value="Stabilisateur sorbet">Stabilisateur sorbet</option>
-  <option value="Purée de fruits">Purée de fruits</option>
+  <optgroup label="Glaces et Sorbets">
+    <option value="Sucre">Sucre</option>
+    <option value="Sucre inverti">Sucre inverti</option>
+    <option value="Dextrose">Dextrose</option>
+    <option value="Glucose">Glucose</option>
+    <option value="Huile de coco">Huile de coco</option>
+    <option value="Lait entier">Lait entier</option>
+    <option value="Crème">Crème</option>
+    <option value="Lait en poudre">Lait en poudre</option>
+    <option value="Stabilisateur glace">Stabilisateur glace</option>
+    <option value="Stabilisateur sorbet">Stabilisateur sorbet</option>
+    <option value="Purée de fruits">Purée de fruits</option>
   </optgroup>
-
   <option value="Autre">Autre (à préciser)</option>
 </select>
 
@@ -97,7 +96,7 @@ th, td {
 </select>
 
 <input id="dlc" type="date">
-<input id="quantite" type="number" placeholder="quantité">
+<input id="quantite" type="number" placeholder="Quantité (sacs)">
 
 <button onclick="ajouterLot()">Ajouter</button>
 
@@ -113,8 +112,8 @@ th, td {
 <th>Fournisseur</th>
 <th>Lot</th>
 <th>DLC / DLUO</th>
-<th>Quantités</th>
-<th>Action</th>
+<th>Quantité</th>
+<th>Sortie</th>
 </tr>
 </thead>
 <tbody id="tableStock"></tbody>
@@ -135,16 +134,15 @@ th, td {
 let stock = JSON.parse(localStorage.getItem("stock")) || [];
 let hist = JSON.parse(localStorage.getItem("hist")) || [];
 
-/* ----- ONGLET ----- */
+/* ONGLET */
 function showTab(tab){
   document.getElementById("tab-mp").style.display = tab === "mp" ? "block" : "none";
   document.getElementById("tab-ms").style.display = tab === "ms" ? "block" : "none";
-
   document.getElementById("btn-mp").classList.toggle("active", tab === "mp");
   document.getElementById("btn-ms").classList.toggle("active", tab === "ms");
 }
 
-/* ----- STOCK ----- */
+/* STOCK */
 function save(){
   localStorage.setItem("stock", JSON.stringify(stock));
   localStorage.setItem("hist", JSON.stringify(hist));
@@ -152,7 +150,7 @@ function save(){
 
 function ajouterLot(){
   if(!lot.value || !quantite.value){
-    alert("Lot et nombre de sacs obligatoires.");
+    alert("Lot et quantité obligatoires.");
     return;
   }
 
@@ -173,16 +171,6 @@ function ajouterLot(){
   lot.value = "";
   dlc.value = "";
   quantite.value = "";
-}
-
-function sortirSac(i){
-  if(stock[i].sacs > 0){
-    stock[i].sacs--;
-    hist.unshift(new Date().toLocaleDateString() +
-      " : 1 sac " + stock[i].matiere + " (lot " + stock[i].lot + ")");
-    save();
-    afficher();
-  }
 }
 
 function afficher(){
@@ -216,20 +204,49 @@ function afficher(){
         <td>${dateAff}</td>
         <td>${x.sacs}</td>
         <td>
-  <button onclick="modifierTemp(${i}, -1)">−</button>
-  <strong style="margin:0 6px;">${x.tempSacs ?? x.sacs}</strong>
-  <button onclick="modifierTemp(${i}, 1)">+</button>
-  <br>
-  <button onclick="validerAction(${i})">Valider</button>
-</td>
-      </tr>`;
+          <input type="number" min="0" style="width:60px" id="sortie-${i}" placeholder="0">
+          <button onclick="validerSortie(${i})">Valider</button>
+        </td>
+      </tr>
+    `;
   });
 
   hist.forEach(h => historique.innerHTML += `<li>${h}</li>`);
 }
 
+function validerSortie(index){
+  const champ = document.getElementById("sortie-" + index);
+  const sortie = Number(champ.value);
+
+  if(!sortie || sortie <= 0){
+    alert("Indique un nombre de sacs à sortir.");
+    return;
+  }
+
+  if(sortie > stock[index].sacs){
+    alert("Sortie supérieure au stock disponible.");
+    return;
+  }
+
+  stock[index].sacs -= sortie;
+
+  hist.unshift(
+    new Date().toLocaleDateString() +
+    " : " +
+    sortie +
+    " sac(s) SORTI(S) " +
+    stock[index].matiere +
+    " (lot " + stock[index].lot + ")"
+  );
+
+  champ.value = "";
+  save();
+  afficher();
+}
+
+/* EXPORT */
 function exportStock(){
-  let csv = "Matière;Fournisseur;Lot;Type;Date;Sacs\n";
+  let csv = "Matière;Fournisseur;Lot;Type;Date;Quantité\n";
   stock.forEach(x=>{
     csv += `${x.matiere};${x.fournisseur};${x.lot};${x.type};${x.date};${x.sacs}\n`;
   });
@@ -242,59 +259,19 @@ function exportHistorique(){
   telechargerCSV(csv,"historique_neige_azur.csv");
 }
 
-function telechargerCSV(c,n){
-  const blob=new Blob([c],{type:"text/csv"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download=n;
+function telechargerCSV(contenu, nom){
+  const blob = new Blob([contenu], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = nom;
   a.click();
 }
 
 matiere.addEventListener("change",()=>{
-  matiereAutre.style.display = matiere.value==="Autre"?"block":"none";
+  matiereAutre.style.display = matiere.value === "Autre" ? "block" : "none";
 });
 
 afficher();
-
-  function modifierTemp(index, valeur){
-  if(stock[index].tempSacs === undefined){
-    stock[index].tempSacs = stock[index].sacs;
-  }
-
-  stock[index].tempSacs += valeur;
-
-  if(stock[index].tempSacs < 0){
-    stock[index].tempSacs = 0;
-  }
-
-  afficher();
-}
-
-function validerAction(index){
-  const ancien = stock[index].sacs;
-  const nouveau = stock[index].tempSacs ?? ancien;
-
-  if(nouveau === ancien){
-    alert("Aucune modification à valider.");
-    return;
-  }
-
-  const diff = nouveau - ancien;
-  stock[index].sacs = nouveau;
-  delete stock[index].tempSacs;
-
-  hist.unshift(
-    new Date().toLocaleDateString() +
-    " : " +
-    (diff > 0 ? "+" : "") + diff +
-    " sac(s) " +
-    stock[index].matiere +
-    " (lot " + stock[index].lot + ")"
-  );
-
-  save();
-  afficher();
-}
 </script>
 
 </body>
