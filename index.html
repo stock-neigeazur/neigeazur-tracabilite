@@ -215,7 +215,13 @@ function afficher(){
         <td>${x.lot}</td>
         <td>${dateAff}</td>
         <td>${x.sacs}</td>
-        <td><button onclick="sortirSac(${i})">-1</button></td>
+        <td>
+  <button onclick="modifierTemp(${i}, -1)">−</button>
+  <strong style="margin:0 6px;">${x.tempSacs ?? x.sacs}</strong>
+  <button onclick="modifierTemp(${i}, 1)">+</button>
+  <br>
+  <button onclick="validerAction(${i})">Valider</button>
+</td>
       </tr>`;
   });
 
@@ -249,6 +255,46 @@ matiere.addEventListener("change",()=>{
 });
 
 afficher();
+
+  function modifierTemp(index, valeur){
+  if(stock[index].tempSacs === undefined){
+    stock[index].tempSacs = stock[index].sacs;
+  }
+
+  stock[index].tempSacs += valeur;
+
+  if(stock[index].tempSacs < 0){
+    stock[index].tempSacs = 0;
+  }
+
+  afficher();
+}
+
+function validerAction(index){
+  const ancien = stock[index].sacs;
+  const nouveau = stock[index].tempSacs ?? ancien;
+
+  if(nouveau === ancien){
+    alert("Aucune modification à valider.");
+    return;
+  }
+
+  const diff = nouveau - ancien;
+  stock[index].sacs = nouveau;
+  delete stock[index].tempSacs;
+
+  hist.unshift(
+    new Date().toLocaleDateString() +
+    " : " +
+    (diff > 0 ? "+" : "") + diff +
+    " sac(s) " +
+    stock[index].matiere +
+    " (lot " + stock[index].lot + ")"
+  );
+
+  save();
+  afficher();
+}
 </script>
 
 </body>
