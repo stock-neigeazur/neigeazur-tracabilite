@@ -121,7 +121,8 @@ th, td {
 </table>
 
 <h3>Historique des sorties</h3>
-<ul id="historique"></ul>
+<h3>Sorties du mois en cours</h3>
+<ul id="sortiesMoisListe"></ul>
 
 </div>
 
@@ -157,6 +158,9 @@ th, td {
 <script>
 let stock = JSON.parse(localStorage.getItem("stock")) || [];
 let hist = JSON.parse(localStorage.getItem("hist")) || [];
+let sortiesMois = JSON.parse(localStorage.getItem("sortiesMois")) || [];
+let historiqueMois = JSON.parse(localStorage.getItem("historiqueMois")) || [];
+let moisActuel = localStorage.getItem("moisActuel") || new Date().getMonth();
 
 /* ONGLET */
 function showTab(tab){
@@ -257,18 +261,19 @@ function validerSortie(index){
 
   stock[index].sacs -= sortie;
 
-  hist.unshift(
-    new Date().toLocaleDateString() +
-    " : " +
-    sortie +
-    " sac(s) SORTI(S) " +
-    stock[index].matiere +
-    " (lot " + stock[index].lot + ")"
-  );
+  sortiesMois.push({
+    date: new Date().toLocaleDateString(),
+    matiere: stock[index].matiere,
+    lot: stock[index].lot,
+    quantite: sortie
+  });
+
+  localStorage.setItem("sortiesMois", JSON.stringify(sortiesMois));
+  save();
 
   champ.value = "";
-  save();
   afficher();
+  afficherSortiesMois();
 }
 
 /* EXPORT */
@@ -298,6 +303,79 @@ matiere.addEventListener("change",()=>{
   matiereAutre.style.display = matiere.value === "Autre" ? "block" : "none";
 });
 
+function verifierChangementMois(){
+  const moisMaintenant = new Date().getMonth();
+
+  if(moisMaintenant != moisActuel && sortiesMois.length > 0){
+    historiqueMois.push({
+      mois: moisActuel,
+      annee: new Date().getFullYear(),
+      sorties: sortiesMois
+    });
+
+    sortiesMois = [];
+    moisActuel = moisMaintenant;
+
+    localStorage.setItem("historiqueMois", JSON.stringify(historiqueMois));
+    localStorage.setItem("sortiesMois", JSON.stringify(sortiesMois));
+    localStorage.setItem("moisActuel", moisActuel);
+  }
+}
+
+function afficherSortiesMois(){
+  sortiesMoisListe.innerHTML = "";
+
+  sortiesMois.forEach((s,i)=>{
+    sortiesMoisListe.innerHTML += `
+      <li>
+        ${s.date} – ${s.quantite} sac(s) ${s.matiere} (lot ${s.lot})
+        <button onclick="supprimerSortie(${i})">Supprimer</button>
+      </li>
+    `;
+  });
+}
+
+function supprimerSortie(index){
+  const s = sortiesMois[index];
+  stock.find(x => x.matiere === s.matiere && x.lot === s.lot).sacs += s.quantite;
+
+  sortiesMois.splice(index,1);
+
+  localStorage.setItem("sortiesMois", JSON.stringify(sortiesMois));
+  save();
+  afficher();
+  afficherSortiesMois();
+}
+
+function remplirSelectMois(){
+  moisSelect.innerHTML = '<option value="">— Choisir un mois —</option>';
+
+  historiqueMois.forEach((m,i)=>{
+    const nomMois = new Date(m.annee, m.mois).toLocaleString("fr-FR",{month:"long",year:"numeric"});
+    moisSelect.innerHTML += `<option value="${i}">${nomMois}</option>`;
+  });
+}
+
+moisSelect.addEventListener("change", ()=>{
+  const index = moisSelect.value;
+  tableHistorique.innerHTML = "";
+
+  if(index === "") return;
+
+  historiqueMois[index].sorties.forEach(s=>{
+    tableHistorique.innerHTML += `
+      <tr>
+        <td>${s.date}</td>
+        <td>${s.matiere}</td>
+        <td>${s.lot}</td>
+        <td>${s.quantite}</td>
+      </tr>
+    `;
+  });
+});
+
+remplirSelectMois();
+verifierChangementMois();
 afficher();
 </script>
 
