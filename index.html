@@ -56,6 +56,33 @@ th, td {
 
 <body>
 
+<div id="app" style="display:none;">
+
+<div id="home">
+
+  <h1>Gestion des stocks</h1>
+  <div class="subtitle">Neige Azur</div>
+
+  <div class="dashboard">
+    <div class="card" onclick="openSection('ajout')">
+      ➕<br>Ajout stock
+    </div>
+
+    <div class="card" onclick="openSection('stock')">
+      📦<br>Stock
+    </div>
+
+    <div class="card" onclick="openSection('historique')">
+      🧾<br>Historique sorties
+    </div>
+
+    <div class="card" onclick="openSection('stats')">
+      📊<br>Stats
+    </div>
+  </div>
+
+</div>
+
 <h1>Traçabilité matières – Neige Azur</h1>
 
 <div class="tabs">
@@ -350,11 +377,23 @@ matiere.addEventListener("change", () => {
   matiereAutre.style.display = matiere.value === "Autre" ? "block" : "none";
 });
 
+function openSection(section) {
+  document.getElementById("home").style.display = "none";
+  document.getElementById("app").style.display = "block";
+
+  if (section === "ajout") showTab("mp");
+  if (section === "stock") showTab("mp");
+  if (section === "historique") showTab("hist");
+  if (section === "stats") alert("Stats à venir");
+}
+
 window.addEventListener("load", () => {
   chargerDonneesFirebase();
   ecouterFirebase();
 });
 </script>
+
+</div>
 
 </body>
 </html>
