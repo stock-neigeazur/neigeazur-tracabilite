@@ -219,7 +219,7 @@ function showTab(tab){
   document.getElementById("btn-ms").classList.toggle("active", tab === "ms");
 }
 
-function ajouterLot(){
+async function ajouterLot(){
   if(!lot.value || !quantite.value) return;
 
   stock.unshift({
@@ -231,7 +231,7 @@ function ajouterLot(){
     sacs: Number(quantite.value)
   });
 
-  save();
+  await save();   // ⬅️ POINT CLÉ
   afficher();
 
   lot.value = "";
@@ -260,7 +260,7 @@ function afficher(){
   afficherSortiesMois();
 }
 
-function validerSortie(i){
+async function validerSortie(i){
   const q = Number(document.getElementById("sortie-"+i).value);
   if(!q || q > stock[i].sacs) return;
 
@@ -272,10 +272,9 @@ function validerSortie(i){
     quantite: q
   });
 
-  save();
+  await save();   // ⬅️ POINT CLÉ
   afficher();
 }
-
 function afficherSortiesMois(){
   sortiesMoisListe.innerHTML = "";
   sortiesMois.forEach(s=>{
