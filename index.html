@@ -149,9 +149,13 @@ function save(){
 }
 
 function showTab(tab){
-  tab-mp.style.display = tab === "mp" ? "block" : "none";
-  tab-hist.style.display = tab === "hist" ? "block" : "none";
-  tab-ms.style.display = tab === "ms" ? "block" : "none";
+  document.getElementById("tab-mp").style.display   = tab === "mp"   ? "block" : "none";
+  document.getElementById("tab-hist").style.display = tab === "hist" ? "block" : "none";
+  document.getElementById("tab-ms").style.display   = tab === "ms"   ? "block" : "none";
+
+  document.getElementById("btn-mp").classList.toggle("active", tab === "mp");
+  document.getElementById("btn-hist").classList.toggle("active", tab === "hist");
+  document.getElementById("btn-ms").classList.toggle("active", tab === "ms");
 }
 
 function ajouterLot(){
