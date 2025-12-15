@@ -245,7 +245,7 @@ async function ajouterLot(){
     sacs: Number(quantite.value)
   });
 
-  await save();   // ⬅️ POINT CLÉ
+  save().catch(console.error);
   afficher();
 
   lot.value = "";
