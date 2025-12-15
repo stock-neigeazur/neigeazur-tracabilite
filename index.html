@@ -194,6 +194,19 @@ let sortiesMois = [];
 let historiqueMois = [];
 let moisActuel = new Date().getMonth();
 
+// 🔧 Références DOM (OBLIGATOIRE avec type="module")
+const matiere = document.getElementById("matiere");
+const matiereAutre = document.getElementById("matiereAutre");
+const fournisseur = document.getElementById("fournisseur");
+const fournisseurAutre = document.getElementById("fournisseurAutre");
+const lot = document.getElementById("lot");
+const type = document.getElementById("type");
+const dlc = document.getElementById("dlc");
+const quantite = document.getElementById("quantite");
+
+const tableStock = document.getElementById("tableStock");
+const sortiesMoisListe = document.getElementById("sortiesMoisListe");
+
 async function save() {
   const ref = doc(window.db, "neigeazur", "data");
 
