@@ -84,7 +84,21 @@ th, td {
   <option value="Autre">Autre (à préciser)</option>
 </select>
 
-<input id="fournisseur" placeholder="Fournisseur">
+<select id="fournisseur">
+  <option value="">— Choisir un fournisseur —</option>
+  <option value="Montaigu">Montaigu</option>
+  <option value="Giraudon">Giraudon</option>
+  <option value="Fedpa">Fedpa</option>
+  <option value="Socovo">Socovo</option>
+  <option value="Rogelfruits">Rogelfruits</option>
+  <option value="Autre">Autre (à préciser)</option>
+</select>
+
+<input id="fournisseurAutre" placeholder="Préciser le fournisseur" style="display:none">">Rougelfruits</option>
+  <option value="Autre">Autre (à préciser)</option>
+</select>
+
+<input id="fournisseurAutre" placeholder="Préciser le fournisseur" style="display:none">
 <input id="lot" placeholder="Numéro de lot">
 
 <select id="type">
@@ -171,7 +185,9 @@ function ajouterLot(){
 
   stock.unshift({
     matiere: matiere.value,
-    fournisseur: fournisseur.value || "—",
+fournisseur: fournisseur.value === "Autre"
+  ? fournisseurAutre.value
+  : fournisseur.value,
     lot: lot.value,
     type: type.value,
     date: dlc.value || "",
@@ -241,6 +257,11 @@ function verifierChangementMois(){
     localStorage.setItem("moisActuel", moisActuel);
   }
 }
+
+fournisseur.addEventListener("change", () => {
+  fournisseurAutre.style.display =
+    fournisseur.value === "Autre" ? "block" : "none";
+});
 
 verifierChangementMois();
 afficher();
