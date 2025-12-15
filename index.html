@@ -160,7 +160,13 @@ th, td {
 <!-- Firebase -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    onSnapshot
+  } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "TON_API_KEY",
@@ -174,24 +180,33 @@ th, td {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  window.db = db; //
+  window.db = db;
+  window.doc = doc;
+  window.getDoc = getDoc;
+  window.setDoc = setDoc;
+  window.onSnapshot = onSnapshot;
 </script>
 
 <script>
 let stock = [];
 let sortiesMois = [];
 let historiqueMois = [];
-let moisActuel = [];
+let moisActuel = new Date().getMonth();
 
 async function save() {
   const ref = doc(window.db, "neigeazur", "data");
 
-  await setDoc(ref, {
-    stock: stock,
-    sortiesMois: sortiesMois,
-    historiqueMois: historiqueMois,
-    updatedAt: new Date()
-  });
+  await setDoc(
+    ref,
+    {
+      stock: stock,
+      sortiesMois: sortiesMois,
+      historiqueMois: historiqueMois,
+      moisActuel: moisActuel,
+      updatedAt: new Date()
+    },
+    { merge: true }
+  );
 }
 
 function showTab(tab){
@@ -208,17 +223,13 @@ function ajouterLot(){
   if(!lot.value || !quantite.value) return;
 
   stock.unshift({
-  matiere: matiere.value === "Autre"
-    ? matiereAutre.value
-    : matiere.value,
-  fournisseur: fournisseur.value === "Autre"
-    ? fournisseurAutre.value
-    : fournisseur.value,
-  lot: lot.value,
-  type: type.value,
-  date: dlc.value || "",
-  sacs: Number(quantite.value)
-});
+    matiere: matiere.value === "Autre" ? matiereAutre.value : matiere.value,
+    fournisseur: fournisseur.value === "Autre" ? fournisseurAutre.value : fournisseur.value,
+    lot: lot.value,
+    type: type.value,
+    date: dlc.value || "",
+    sacs: Number(quantite.value)
+  });
 
   save();
   afficher();
@@ -272,18 +283,6 @@ function afficherSortiesMois(){
   });
 }
 
-function verifierChangementMois(){
-  const m = new Date().getMonth();
-  if(m !== moisActuel && sortiesMois.length){
-    historiqueMois.push({ mois: moisActuel, sorties: sortiesMois });
-    sortiesMois = [];
-    moisActuel = m;
-    localStorage.setItem("historiqueMois", JSON.stringify(historiqueMois));
-    localStorage.setItem("sortiesMois", JSON.stringify(sortiesMois));
-    localStorage.setItem("moisActuel", moisActuel);
-  }
-}
-
 async function chargerDonneesFirebase() {
   const ref = doc(window.db, "neigeazur", "data");
   const snap = await getDoc(ref);
@@ -293,18 +292,19 @@ async function chargerDonneesFirebase() {
     stock = data.stock || [];
     sortiesMois = data.sortiesMois || [];
     historiqueMois = data.historiqueMois || [];
+    moisActuel = data.moisActuel ?? new Date().getMonth();
   } else {
     await setDoc(ref, {
       stock: [],
       sortiesMois: [],
       historiqueMois: [],
+      moisActuel: new Date().getMonth(),
       updatedAt: new Date()
     });
   }
 
   afficher();
   afficherSortiesMois();
-  remplirSelectMois();
 }
 
 function ecouterFirebase() {
@@ -316,25 +316,22 @@ function ecouterFirebase() {
       stock = data.stock || [];
       sortiesMois = data.sortiesMois || [];
       historiqueMois = data.historiqueMois || [];
+      moisActuel = data.moisActuel ?? new Date().getMonth();
 
       afficher();
       afficherSortiesMois();
-      remplirSelectMois();
     }
   });
 }
 
 fournisseur.addEventListener("change", () => {
-  fournisseurAutre.style.display =
-    fournisseur.value === "Autre" ? "block" : "none";
+  fournisseurAutre.style.display = fournisseur.value === "Autre" ? "block" : "none";
 });
 
 matiere.addEventListener("change", () => {
-  matiereAutre.style.display =
-    matiere.value === "Autre" ? "block" : "none";
+  matiereAutre.style.display = matiere.value === "Autre" ? "block" : "none";
 });
 
-verifierChangementMois();
 chargerDonneesFirebase();
 ecouterFirebase();
 </script>
