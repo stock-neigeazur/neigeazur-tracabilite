@@ -58,36 +58,24 @@ th, td {
 
 <h1>Traçabilité matières – Neige Azur</h1>
 
-<!-- ONGLET -->
 <div class="tabs">
   <button id="btn-mp" class="active" onclick="showTab('mp')">Matières premières</button>
   <button id="btn-ms" onclick="showTab('ms')">Matières secondaires</button>
   <button id="btn-hist" onclick="showTab('hist')">Historique</button>
 </div>
 
-<!-- ================= MATIÈRES PREMIÈRES ================= -->
 <div id="tab-mp">
 
 <h3>Ajouter un lot</h3>
 
 <select id="matiere">
-  <optgroup label="Glaces et Sorbets">
-    <option value="Sucre">Sucre</option>
-    <option value="Sucre inverti">Sucre inverti</option>
-    <option value="Dextrose">Dextrose</option>
-    <option value="Glucose">Glucose</option>
-    <option value="Huile de coco">Huile de coco</option>
-    <option value="Lait entier">Lait entier</option>
-    <option value="Crème">Crème</option>
-    <option value="Lait en poudre">Lait en poudre</option>
-    <option value="Stabilisateur glace">Stabilisateur glace</option>
-    <option value="Stabilisateur sorbet">Stabilisateur sorbet</option>
-    <option value="Purée de fruits">Purée de fruits</option>
-  </optgroup>
-  <option value="Autre">Autre (à préciser)</option>
+  <option value="Sucre">Sucre</option>
+  <option value="Sucre inverti">Sucre inverti</option>
+  <option value="Dextrose">Dextrose</option>
+  <option value="Glucose">Glucose</option>
+  <option value="Huile de coco">Huile de coco</option>
 </select>
 
-<input id="matiereAutre" placeholder="Préciser la matière (si autre)" style="display:none">
 <input id="fournisseur" placeholder="Fournisseur">
 <input id="lot" placeholder="Numéro de lot">
 
@@ -103,9 +91,6 @@ th, td {
 
 <h3>Stock actuel</h3>
 
-<button onclick="exportStock()">Exporter le stock (CSV)</button>
-<button onclick="exportHistorique()">Exporter l’historique (CSV)</button>
-
 <table>
 <thead>
 <tr>
@@ -120,7 +105,6 @@ th, td {
 <tbody id="tableStock"></tbody>
 </table>
 
-<h3>Historique des sorties</h3>
 <h3>Sorties du mois en cours</h3>
 <ul id="sortiesMoisListe"></ul>
 
@@ -128,28 +112,26 @@ th, td {
 
 <div id="tab-hist" style="display:none;">
 
-  <h3>Historique des sorties</h3>
+<h3>Historique des sorties</h3>
 
-  <label for="moisSelect">Mois :</label>
-  <select id="moisSelect">
-    <option value="">— Choisir un mois —</option>
-  </select>
+<select id="moisSelect">
+  <option value="">— Choisir un mois —</option>
+</select>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Matière</th>
-        <th>Lot</th>
-        <th>Quantité</th>
-      </tr>
-    </thead>
-    <tbody id="tableHistorique"></tbody>
-  </table>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Matière</th>
+<th>Lot</th>
+<th>Quantité</th>
+</tr>
+</thead>
+<tbody id="tableHistorique"></tbody>
+</table>
 
 </div>
 
-<!-- ================= MATIÈRES SECONDAIRES ================= -->
 <div id="tab-ms" style="display:none;">
   <h3>Matières secondaires</h3>
   <p>Module à venir.</p>
@@ -157,36 +139,26 @@ th, td {
 
 <script>
 let stock = JSON.parse(localStorage.getItem("stock")) || [];
-let hist = JSON.parse(localStorage.getItem("hist")) || [];
 let sortiesMois = JSON.parse(localStorage.getItem("sortiesMois")) || [];
 let historiqueMois = JSON.parse(localStorage.getItem("historiqueMois")) || [];
-let moisActuel = localStorage.getItem("moisActuel") || new Date().getMonth();
+let moisActuel = Number(localStorage.getItem("moisActuel")) || new Date().getMonth();
 
-/* ONGLET */
-function showTab(tab){
-  document.getElementById("tab-mp").style.display = tab === "mp" ? "block" : "none";
-  document.getElementById("tab-hist").style.display = tab === "hist" ? "block" : "none";
-  document.getElementById("tab-ms").style.display = tab === "ms" ? "block" : "none";
-
-  document.getElementById("btn-mp").classList.toggle("active", tab === "mp");
-  document.getElementById("btn-hist").classList.toggle("active", tab === "hist");
-  document.getElementById("btn-ms").classList.toggle("active", tab === "ms");
-}
-
-/* STOCK */
 function save(){
   localStorage.setItem("stock", JSON.stringify(stock));
-  localStorage.setItem("hist", JSON.stringify(hist));
+  localStorage.setItem("sortiesMois", JSON.stringify(sortiesMois));
+}
+
+function showTab(tab){
+  tab-mp.style.display = tab === "mp" ? "block" : "none";
+  tab-hist.style.display = tab === "hist" ? "block" : "none";
+  tab-ms.style.display = tab === "ms" ? "block" : "none";
 }
 
 function ajouterLot(){
-  if(!lot.value || !quantite.value){
-    alert("Lot et quantité obligatoires.");
-    return;
-  }
+  if(!lot.value || !quantite.value) return;
 
   stock.push({
-    matiere: matiere.value === "Autre" ? matiereAutre.value : matiere.value,
+    matiere: matiere.value,
     fournisseur: fournisseur.value || "—",
     lot: lot.value,
     type: type.value,
@@ -197,184 +169,67 @@ function ajouterLot(){
   save();
   afficher();
 
-  matiereAutre.value = "";
-  fournisseur.value = "";
   lot.value = "";
-  dlc.value = "";
   quantite.value = "";
 }
 
 function afficher(){
   tableStock.innerHTML = "";
-  historique.innerHTML = "";
-  const now = new Date();
-
-  stock.sort((a,b)=>{
-    if(!a.date) return 1;
-    if(!b.date) return -1;
-    return new Date(a.date) - new Date(b.date);
-  });
 
   stock.forEach((x,i)=>{
-    let classe = "ok";
-    let dateAff = "—";
-
-    if(x.date){
-      const d = new Date(x.date);
-      const diff = (d - now) / 86400000;
-      dateAff = x.date.split("-").reverse().join("/");
-      if(diff < 0) classe = "expired";
-      else if(diff < (x.type === "DLC" ? 15 : 30)) classe = "soon";
-    }
-
     tableStock.innerHTML += `
-      <tr class="${classe}">
+      <tr>
         <td>${x.matiere}</td>
         <td>${x.fournisseur}</td>
         <td>${x.lot}</td>
-        <td>${dateAff}</td>
+        <td>${x.date}</td>
         <td>${x.sacs}</td>
         <td>
-          <input type="number" min="0" style="width:60px" id="sortie-${i}" placeholder="0">
+          <input type="number" id="sortie-${i}" style="width:60px">
           <button onclick="validerSortie(${i})">Valider</button>
         </td>
       </tr>
     `;
   });
 
-  hist.forEach(h => historique.innerHTML += `<li>${h}</li>`);
-}
-
-function validerSortie(index){
-  const champ = document.getElementById("sortie-" + index);
-  const sortie = Number(champ.value);
-
-  if(!sortie || sortie <= 0){
-    alert("Indique un nombre de sacs à sortir.");
-    return;
-  }
-
-  if(sortie > stock[index].sacs){
-    alert("Sortie supérieure au stock disponible.");
-    return;
-  }
-
-  stock[index].sacs -= sortie;
-
-  sortiesMois.push({
-    date: new Date().toLocaleDateString(),
-    matiere: stock[index].matiere,
-    lot: stock[index].lot,
-    quantite: sortie
-  });
-
-  localStorage.setItem("sortiesMois", JSON.stringify(sortiesMois));
-  save();
-
-  champ.value = "";
-  afficher();
   afficherSortiesMois();
 }
 
-/* EXPORT */
-function exportStock(){
-  let csv = "Matière;Fournisseur;Lot;Type;Date;Quantité\n";
-  stock.forEach(x=>{
-    csv += `${x.matiere};${x.fournisseur};${x.lot};${x.type};${x.date};${x.sacs}\n`;
+function validerSortie(i){
+  const q = Number(document.getElementById("sortie-"+i).value);
+  if(!q || q > stock[i].sacs) return;
+
+  stock[i].sacs -= q;
+  sortiesMois.push({
+    date: new Date().toLocaleDateString(),
+    matiere: stock[i].matiere,
+    lot: stock[i].lot,
+    quantite: q
   });
-  telechargerCSV(csv,"stock_neige_azur.csv");
+
+  save();
+  afficher();
 }
 
-function exportHistorique(){
-  let csv = "Historique\n";
-  hist.forEach(h=>csv+=h+"\n");
-  telechargerCSV(csv,"historique_neige_azur.csv");
+function afficherSortiesMois(){
+  sortiesMoisListe.innerHTML = "";
+  sortiesMois.forEach(s=>{
+    sortiesMoisListe.innerHTML += `<li>${s.date} – ${s.quantite} sacs ${s.matiere}</li>`;
+  });
 }
-
-function telechargerCSV(contenu, nom){
-  const blob = new Blob([contenu], { type: "text/csv" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = nom;
-  a.click();
-}
-
-matiere.addEventListener("change",()=>{
-  matiereAutre.style.display = matiere.value === "Autre" ? "block" : "none";
-});
 
 function verifierChangementMois(){
-  const moisMaintenant = new Date().getMonth();
-
-  if(moisMaintenant != moisActuel && sortiesMois.length > 0){
-    historiqueMois.push({
-      mois: moisActuel,
-      annee: new Date().getFullYear(),
-      sorties: sortiesMois
-    });
-
+  const m = new Date().getMonth();
+  if(m !== moisActuel && sortiesMois.length){
+    historiqueMois.push({ mois: moisActuel, sorties: sortiesMois });
     sortiesMois = [];
-    moisActuel = moisMaintenant;
-
+    moisActuel = m;
     localStorage.setItem("historiqueMois", JSON.stringify(historiqueMois));
     localStorage.setItem("sortiesMois", JSON.stringify(sortiesMois));
     localStorage.setItem("moisActuel", moisActuel);
   }
 }
 
-function afficherSortiesMois(){
-  sortiesMoisListe.innerHTML = "";
-
-  sortiesMois.forEach((s,i)=>{
-    sortiesMoisListe.innerHTML += `
-      <li>
-        ${s.date} – ${s.quantite} sac(s) ${s.matiere} (lot ${s.lot})
-        <button onclick="supprimerSortie(${i})">Supprimer</button>
-      </li>
-    `;
-  });
-}
-
-function supprimerSortie(index){
-  const s = sortiesMois[index];
-  stock.find(x => x.matiere === s.matiere && x.lot === s.lot).sacs += s.quantite;
-
-  sortiesMois.splice(index,1);
-
-  localStorage.setItem("sortiesMois", JSON.stringify(sortiesMois));
-  save();
-  afficher();
-  afficherSortiesMois();
-}
-
-function remplirSelectMois(){
-  moisSelect.innerHTML = '<option value="">— Choisir un mois —</option>';
-
-  historiqueMois.forEach((m,i)=>{
-    const nomMois = new Date(m.annee, m.mois).toLocaleString("fr-FR",{month:"long",year:"numeric"});
-    moisSelect.innerHTML += `<option value="${i}">${nomMois}</option>`;
-  });
-}
-
-moisSelect.addEventListener("change", ()=>{
-  const index = moisSelect.value;
-  tableHistorique.innerHTML = "";
-
-  if(index === "") return;
-
-  historiqueMois[index].sorties.forEach(s=>{
-    tableHistorique.innerHTML += `
-      <tr>
-        <td>${s.date}</td>
-        <td>${s.matiere}</td>
-        <td>${s.lot}</td>
-        <td>${s.quantite}</td>
-      </tr>
-    `;
-  });
-});
-
-remplirSelectMois();
 verifierChangementMois();
 afficher();
 </script>
