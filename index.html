@@ -157,15 +157,41 @@ th, td {
   <p>Module à venir.</p>
 </div>
 
-<script>
-let stock = JSON.parse(localStorage.getItem("stock")) || [];
-let sortiesMois = JSON.parse(localStorage.getItem("sortiesMois")) || [];
-let historiqueMois = JSON.parse(localStorage.getItem("historiqueMois")) || [];
-let moisActuel = Number(localStorage.getItem("moisActuel")) || new Date().getMonth();
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-function save(){
-  localStorage.setItem("stock", JSON.stringify(stock));
-  localStorage.setItem("sortiesMois", JSON.stringify(sortiesMois));
+  const firebaseConfig = {
+    apiKey: "TON_API_KEY",
+    authDomain: "neigeazur-stock.firebaseapp.com",
+    projectId: "neigeazur-stock",
+    storageBucket: "neigeazur-stock.appspot.com",
+    messagingSenderId: "XXXXXXXX",
+    appId: "XXXXXXXX"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db; //
+</script>
+
+<script>
+let stock = [];
+let sortiesMois = [];
+let historiqueMois = [];
+let moisActuel = [];
+
+async function save() {
+  const ref = doc(window.db, "neigeazur", "data");
+
+  await setDoc(ref, {
+    stock: stock,
+    sortiesMois: sortiesMois,
+    historiqueMois: historiqueMois,
+    updatedAt: new Date()
+  });
 }
 
 function showTab(tab){
@@ -258,6 +284,46 @@ function verifierChangementMois(){
   }
 }
 
+async function chargerDonneesFirebase() {
+  const ref = doc(window.db, "neigeazur", "data");
+  const snap = await getDoc(ref);
+
+  if (snap.exists()) {
+    const data = snap.data();
+    stock = data.stock || [];
+    sortiesMois = data.sortiesMois || [];
+    historiqueMois = data.historiqueMois || [];
+  } else {
+    await setDoc(ref, {
+      stock: [],
+      sortiesMois: [],
+      historiqueMois: [],
+      updatedAt: new Date()
+    });
+  }
+
+  afficher();
+  afficherSortiesMois();
+  remplirSelectMois();
+}
+
+function ecouterFirebase() {
+  const ref = doc(window.db, "neigeazur", "data");
+
+  onSnapshot(ref, (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      stock = data.stock || [];
+      sortiesMois = data.sortiesMois || [];
+      historiqueMois = data.historiqueMois || [];
+
+      afficher();
+      afficherSortiesMois();
+      remplirSelectMois();
+    }
+  });
+}
+
 fournisseur.addEventListener("change", () => {
   fournisseurAutre.style.display =
     fournisseur.value === "Autre" ? "block" : "none";
@@ -269,7 +335,8 @@ matiere.addEventListener("change", () => {
 });
 
 verifierChangementMois();
-afficher();
+chargerDonneesFirebase();
+ecouterFirebase();
 </script>
 
 </body>
