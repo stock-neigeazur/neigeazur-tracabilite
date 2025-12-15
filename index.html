@@ -182,15 +182,17 @@ function ajouterLot(){
   if(!lot.value || !quantite.value) return;
 
   stock.unshift({
-    matiere: matiere.value,
-fournisseur: fournisseur.value === "Autre"
-  ? fournisseurAutre.value
-  : fournisseur.value,
-    lot: lot.value,
-    type: type.value,
-    date: dlc.value || "",
-    sacs: Number(quantite.value)
-  });
+  matiere: matiere.value === "Autre"
+    ? matiereAutre.value
+    : matiere.value,
+  fournisseur: fournisseur.value === "Autre"
+    ? fournisseurAutre.value
+    : fournisseur.value,
+  lot: lot.value,
+  type: type.value,
+  date: dlc.value || "",
+  sacs: Number(quantite.value)
+});
 
   save();
   afficher();
