@@ -107,7 +107,7 @@ th, td {
 <input id="dlc" type="date">
 <input id="quantite" type="number" placeholder="Quantité (sacs)">
 
-<button onclick="ajouterLot()">Ajouter</button>
+<button onclick="ajouterLot().catch(console.error)">Ajouter</button>
 
 <h3>Stock actuel</h3>
 
