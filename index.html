@@ -252,6 +252,11 @@ async function ajouterLot(){
   quantite.value = "";
 }
 
+// 🔧 Exposition des fonctions pour les onclick HTML
+window.ajouterLot = ajouterLot;
+window.validerSortie = validerSortie;
+window.showTab = showTab;
+ 
 function afficher(){
   tableStock.innerHTML = "";
 
