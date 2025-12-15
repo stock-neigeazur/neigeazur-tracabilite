@@ -62,6 +62,7 @@ th, td {
 <div class="tabs">
   <button id="btn-mp" class="active" onclick="showTab('mp')">Matières premières</button>
   <button id="btn-ms" onclick="showTab('ms')">Matières secondaires</button>
+  <button id="btn-hist" onclick="showTab('hist')">Historique</button>
 </div>
 
 <!-- ================= MATIÈRES PREMIÈRES ================= -->
@@ -124,6 +125,29 @@ th, td {
 
 </div>
 
+<div id="tab-hist" style="display:none;">
+
+  <h3>Historique des sorties</h3>
+
+  <label for="moisSelect">Mois :</label>
+  <select id="moisSelect">
+    <option value="">— Choisir un mois —</option>
+  </select>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Matière</th>
+        <th>Lot</th>
+        <th>Quantité</th>
+      </tr>
+    </thead>
+    <tbody id="tableHistorique"></tbody>
+  </table>
+
+</div>
+
 <!-- ================= MATIÈRES SECONDAIRES ================= -->
 <div id="tab-ms" style="display:none;">
   <h3>Matières secondaires</h3>
@@ -137,8 +161,11 @@ let hist = JSON.parse(localStorage.getItem("hist")) || [];
 /* ONGLET */
 function showTab(tab){
   document.getElementById("tab-mp").style.display = tab === "mp" ? "block" : "none";
+  document.getElementById("tab-hist").style.display = tab === "hist" ? "block" : "none";
   document.getElementById("tab-ms").style.display = tab === "ms" ? "block" : "none";
+
   document.getElementById("btn-mp").classList.toggle("active", tab === "mp");
+  document.getElementById("btn-hist").classList.toggle("active", tab === "hist");
   document.getElementById("btn-ms").classList.toggle("active", tab === "ms");
 }
 
