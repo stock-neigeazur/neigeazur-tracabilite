@@ -83,6 +83,8 @@ th, td {
 
 <div id="app" style="display:none;">
 
+<button onclick="retourAccueil()">🏠 Accueil</button>
+
 <h1>Traçabilité matières – Neige Azur</h1>
 
 <div class="tabs">
@@ -385,6 +387,11 @@ function openSection(section) {
   if (section === "stock") showTab("mp");
   if (section === "historique") showTab("hist");
   if (section === "stats") alert("Stats à venir");
+}
+
+function retourAccueil() {
+  document.getElementById("app").style.display = "none";
+  document.getElementById("home").style.display = "block";
 }
 
 window.addEventListener("load", () => {
