@@ -161,7 +161,7 @@ function showTab(tab){
 function ajouterLot(){
   if(!lot.value || !quantite.value) return;
 
-  stock.push({
+  stock.unshift({
     matiere: matiere.value,
     fournisseur: fournisseur.value || "—",
     lot: lot.value,
