@@ -84,6 +84,8 @@ th, td {
   <option value="Autre">Autre (à préciser)</option>
 </select>
 
+<input id="matiereAutre" placeholder="Préciser la matière" style="display:none">
+
 <select id="fournisseur">
   <option value="">— Choisir un fournisseur —</option>
   <option value="Montaigu">Montaigu</option>
@@ -257,6 +259,11 @@ function verifierChangementMois(){
 fournisseur.addEventListener("change", () => {
   fournisseurAutre.style.display =
     fournisseur.value === "Autre" ? "block" : "none";
+});
+
+matiere.addEventListener("change", () => {
+  matiereAutre.style.display =
+    matiere.value === "Autre" ? "block" : "none";
 });
 
 verifierChangementMois();
