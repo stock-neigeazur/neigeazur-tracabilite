@@ -50,10 +50,6 @@ button { cursor: pointer; }
   transition: all 0.2s ease;
 }
 
-.tabs button {
-  width: auto;
-}
-
 /* Matières premières */
 #btn-mp.active {
   background: #2563eb;        /* bleu */
@@ -134,12 +130,37 @@ th, td {
   font-weight: bold;
   font-size: 15px;
 }
- .tabs button {
-  width: auto !important;
-}
 
 .tabs button.active {
   background-clip: padding-box;
+}
+ /* RESET SAFARI */
+.tab-button {
+  flex: 1;
+  border: none;
+  padding: 12px 8px;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 12px;
+  background: #e5e7eb !important;
+  color: #374151 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* ACTIFS – FORCÉS */
+#btn-mp.active {
+  background: #2563eb !important;
+  color: #ffffff !important;
+}
+
+#btn-ms.active {
+  background: #16a34a !important;
+  color: #ffffff !important;
+}
+
+#btn-hist.active {
+  background: #f59e0b !important;
+  color: #ffffff !important;
 }
 </style>
 </head>
@@ -185,9 +206,15 @@ th, td {
 <h1>Traçabilité matières – Neige Azur</h1>
 
 <div class="tabs">
-  <button id="btn-mp" class="active" onclick="showTab('mp')">Matières premières</button>
-  <button id="btn-ms" onclick="showTab('ms')">Matières secondaires</button>
-  <button id="btn-hist" onclick="showTab('hist')">Historique</button>
+  <button id="btn-mp" class="tab-button active" onclick="showTab('mp')">
+    Matières premières
+  </button>
+  <button id="btn-ms" class="tab-button" onclick="showTab('ms')">
+    Matières secondaires
+  </button>
+  <button id="btn-hist" class="tab-button" onclick="showTab('hist')">
+    Historique
+  </button>
 </div>
 
 <div id="tab-mp">
