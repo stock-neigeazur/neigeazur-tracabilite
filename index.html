@@ -65,6 +65,42 @@ th, td {
   max-width: 100px;
   height: auto;
 }
+ .home-title {
+  text-align: center;
+  margin: 20px 0 30px;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 10px;
+}
+
+.home-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 25px 10px;
+  text-align: center;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.home-card:active {
+  transform: scale(0.97);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
+.home-card .icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.home-card .label {
+  font-weight: bold;
+  font-size: 15px;
+}
 </style>
 </head>
 
@@ -74,25 +110,30 @@ th, td {
 
  <div id="home">
 
-  <h1>Gestion des stocks</h1>
-  <div class="subtitle">Neige Azur</div>
+  <h1 class="home-title">Gestion des stocks</h1>
 
-  <div class="dashboard">
-    <div class="card" onclick="openSection('ajout')">
-      ➕<br>Ajout stock
+  <div class="home-grid">
+
+    <div class="home-card" onclick="openSection('ajout')">
+      <div class="icon">➕</div>
+      <div class="label">Ajout stock</div>
     </div>
 
-    <div class="card" onclick="openSection('stock')">
-      📦<br>Stock
+    <div class="home-card" onclick="openSection('stock')">
+      <div class="icon">📦</div>
+      <div class="label">Stock</div>
     </div>
 
-    <div class="card" onclick="openSection('historique')">
-      🧾<br>Historique sorties
+    <div class="home-card" onclick="openSection('historique')">
+      <div class="icon">🧾</div>
+      <div class="label">Historique sorties</div>
     </div>
 
-    <div class="card" onclick="openSection('stats')">
-      📊<br>Stats
+    <div class="home-card" onclick="openSection('stats')">
+      <div class="icon">📊</div>
+      <div class="label">Stats</div>
     </div>
+
   </div>
 
 </div>
