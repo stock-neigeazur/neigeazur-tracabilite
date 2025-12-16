@@ -17,11 +17,20 @@
 body { font-family: Arial, sans-serif; padding: 15px; }
 h1 { color: #003366; }
 
-input, select, button {
+input, select {
   width: 100%;
   padding: 8px;
   margin: 6px 0;
 }
+
+button:not(.tab-button) {
+  width: 100%;
+  padding: 8px;
+  margin: 6px 0;
+}
+ <button id="btn-mp" class="tab-button active" onclick="showTab('mp')">Matières premières</button>
+<button id="btn-ms" class="tab-button" onclick="showTab('ms')">Matières secondaires</button>
+<button id="btn-hist" class="tab-button" onclick="showTab('hist')">Historique</button>
 
 button { cursor: pointer; }
 
@@ -127,6 +136,13 @@ th, td {
 .home-card .label {
   font-weight: bold;
   font-size: 15px;
+}
+ .tabs button {
+  width: auto !important;
+}
+
+.tabs button.active {
+  background-clip: padding-box;
 }
 </style>
 </head>
