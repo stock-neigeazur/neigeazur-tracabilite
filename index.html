@@ -378,39 +378,36 @@ async function save() {
 
 function showTab(tab){
 
-  // affichage des blocs
   document.getElementById("tab-mp").style.display   = tab === "mp"   ? "block" : "none";
   document.getElementById("tab-hist").style.display = tab === "hist" ? "block" : "none";
   document.getElementById("tab-ms").style.display   = tab === "ms"   ? "block" : "none";
 
-  // reset boutons
   const mp = document.getElementById("btn-mp");
   const ms = document.getElementById("btn-ms");
   const hist = document.getElementById("btn-hist");
 
   [mp, ms, hist].forEach(b => {
     b.classList.remove("active");
-    b.style.backgroundColor = "#e5e7eb";
-    b.style.color = "#374151";
+    b.style.setProperty("background-color", "#e5e7eb", "important");
+    b.style.setProperty("color", "#374151", "important");
   });
 
-  // couleurs forcées
   if(tab === "mp"){
     mp.classList.add("active");
-    mp.style.backgroundColor = "#2563eb"; // bleu
-    mp.style.color = "#ffffff";
+    mp.style.setProperty("background-color", "#2563eb", "important");
+    mp.style.setProperty("color", "#ffffff", "important");
   }
 
   if(tab === "ms"){
     ms.classList.add("active");
-    ms.style.backgroundColor = "#16a34a"; // vert
-    ms.style.color = "#ffffff";
+    ms.style.setProperty("background-color", "#16a34a", "important");
+    ms.style.setProperty("color", "#ffffff", "important");
   }
 
   if(tab === "hist"){
     hist.classList.add("active");
-    hist.style.backgroundColor = "#f59e0b"; // orange
-    hist.style.color = "#ffffff";
+    hist.style.setProperty("background-color", "#f59e0b", "important");
+    hist.style.setProperty("color", "#ffffff", "important");
   }
 }
 
