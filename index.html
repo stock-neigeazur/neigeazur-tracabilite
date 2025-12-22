@@ -30,30 +30,7 @@ section{ display:none }
 </head>
 
 <body>
-  <div id="app" style="display:none;">
-
-<div id="home">
-
-  <h1 class="home-title">Gestion des stocks</h1>
-
-  <div class="home-grid">
-
-    <div class="home-card ajout" onclick="openSection('mp')">
-      ➕ Ajout stock
-    </div>
-
-    <div class="home-card stock" onclick="openSection('mp')">
-      📦 Stock
-    </div>
-
-    <div class="home-card historique" onclick="openSection('hist')">
-      🧾 Historique
-    </div>
-
-  </div>
-
-</div>
-
+ 
 <!-- ACCUEIL -->
 <div id="home">
   <h1>Gestion des stocks</h1>
@@ -107,23 +84,6 @@ section{ display:none }
 
 </div>
 
-
-<!-- STOCK -->
-<section id="section-stock">
-<h2>Stock actuel</h2>
-
-<table border="1" width="100%">
-<thead>
-<tr>
-<th>Matière</th>
-<th>Lot</th>
-<th>Qté</th>
-<th>Sortie</th>
-</tr>
-</thead>
-<tbody id="tableStock"></tbody>
-</table>
-</section>
 
 <!-- HISTORIQUE -->
 <section id="section-hist">
