@@ -156,6 +156,27 @@ th, td {
   background: #f59e0b !important;
   color: #ffffff !important;
 }
+ /* COULEURS ACCUEIL */
+.home-card.ajout {
+  background: #2563eb;
+  color: #fff;
+}
+
+.home-card.stock {
+  background: #16a34a;
+  color: #fff;
+}
+
+.home-card.historique {
+  background: #f59e0b;
+  color: #fff;
+}
+
+.home-card.stats {
+  background: #7c3aed;
+  color: #fff;
+}
+
 </style>
 </head>
 
@@ -169,25 +190,16 @@ th, td {
 
   <div class="home-grid">
 
-    <div class="home-card" onclick="openSection('ajout')">
-      <div class="icon">➕</div>
-      <div class="label">Ajout stock</div>
-    </div>
+    <div class="home-card ajout" onclick="openSection('ajout')">
 
-    <div class="home-card" onclick="openSection('stock')">
-      <div class="icon">📦</div>
-      <div class="label">Stock</div>
-    </div>
+  <div class="home-card stock" onclick="openSection('stock')">
 
-    <div class="home-card" onclick="openSection('historique')">
-      <div class="icon">🧾</div>
-      <div class="label">Historique sorties</div>
-    </div>
 
-    <div class="home-card" onclick="openSection('stats')">
-      <div class="icon">📊</div>
-      <div class="label">Stats</div>
-    </div>
+    <div class="home-card historique" onclick="openSection('historique')">
+
+
+   <div class="home-card stats" onclick="openSection('stats')">
+
 
   </div>
 
