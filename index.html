@@ -232,9 +232,9 @@ th, td {
 </div>
 
 
-<div id="tab-mp">
+<div id="tab-ajout" style="display:none;">
 
-<h3>Ajouter un lot</h3>
+<h3>Ajouter une matière en stock</h3>
 
 <select id="matiere">
   <option value="Sucre">Sucre</option>
@@ -275,28 +275,10 @@ th, td {
 <input id="dlc" type="date">
 <input id="quantite" type="number" placeholder="Quantité (sacs)">
 
-<button onclick="ajouterLot().catch(console.error)">Ajouter</button>
-
-<h3>Stock actuel</h3>
-
-<table>
-<thead>
-<tr>
-<th>Matière</th>
-<th>Fournisseur</th>
-<th>Lot</th>
-<th>DLC / DLUO</th>
-<th>Quantité</th>
-<th>Sortie</th>
-</tr>
-</thead>
-<tbody id="tableStock"></tbody>
-</table>
-
-<h3>Sorties du mois en cours</h3>
-<ul id="sortiesMoisListe"></ul>
+<button onclick="ajouterLot().catch(console.error)">➕ Ajouter au stock</button>
 
 </div>
+
 
 <div id="tab-hist" style="display:none;">
 
@@ -392,12 +374,13 @@ async function save() {
 }
 
 function showTab(tab){
-  document.getElementById("tab-mp").style.display   = "none";
-  document.getElementById("tab-ms").style.display   = "none";
+  document.getElementById("tab-ajout").style.display = "none";
+  document.getElementById("tab-stock").style.display = "none";
   document.getElementById("tab-hist").style.display = "none";
 
   document.getElementById("tab-" + tab).style.display = "block";
 }
+
 
 
 async function ajouterLot(){
@@ -518,26 +501,15 @@ matiere.addEventListener("change", () => {
 });
 
 function openSection(section) {
-  // cacher accueil
   document.getElementById("home").style.display = "none";
+  document.getElementById("app").style.display = "block";
 
-  // afficher app
-  const app = document.getElementById("app");
-  app.style.display = "block";
-
-  // forcer un onglet visible
-  if (section === "ajout" || section === "stock") {
-    showTab("mp");
-  }
-
-  if (section === "historique") {
-    showTab("hist");
-  }
-
-  if (section === "stats") {
-    alert("Stats à venir");
-  }
+  if (section === "ajout") showTab("ajout");
+  if (section === "stock") showTab("stock");
+  if (section === "historique") showTab("hist");
+  if (section === "stats") alert("Stats à venir");
 }
+
 
 
 function retourAccueil() {
