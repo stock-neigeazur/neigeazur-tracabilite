@@ -101,14 +101,13 @@ th, td {
 }
 
 .home-card {
-  background: #ffffff;
   border-radius: 18px;
   padding: 25px 10px;
   text-align: center;
   box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-  cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  color: #fff;
 }
+
 
 .home-card:active {
   transform: scale(0.97);
@@ -190,17 +189,24 @@ th, td {
 
   <div class="home-grid">
 
-    <div class="home-card ajout" onclick="openSection('ajout')">
+  <div class="home-card ajout" onclick="openSection('ajout')">
+    <div class="icon">➕</div>
+    <div class="label">Ajout stock</div>
+  </div>
 
   <div class="home-card stock" onclick="openSection('stock')">
+    <div class="icon">📦</div>
+    <div class="label">Stock</div>
+  </div>
 
+  <div class="home-card historique" onclick="openSection('historique')">
+    <div class="icon">🧾</div>
+    <div class="label">Historique sorties</div>
+  </div>
 
-    <div class="home-card historique" onclick="openSection('historique')">
-
-
-   <div class="home-card stats" onclick="openSection('stats')">
-
-
+  <div class="home-card stats" onclick="openSection('stats')">
+    <div class="icon">📊</div>
+    <div class="label">Stats</div>
   </div>
 
 </div>
