@@ -1,531 +1,140 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Traçabilité matières – Neige Azur</title>
+<title>Traçabilité – Neige Azur</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<link rel="manifest" href="manifest.json">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Neige Azur">
 
 <style>
 body { font-family: Arial, sans-serif; padding: 15px; }
-h1 { color: #003366; }
+h1 { color:#003366 }
 
-input, select {
-  width: 100%;
-  padding: 8px;
-  margin: 6px 0;
+button { width:100%; padding:10px; margin:8px 0 }
+
+.home-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
 }
 
-button:not(.tab-button) {
-  width: 100%;
-  padding: 8px;
-  margin: 6px 0;
+.home-card{
+  padding:25px;
+  text-align:center;
+  border-radius:15px;
+  box-shadow:0 4px 10px rgba(0,0,0,.1);
+  cursor:pointer;
 }
 
-button { cursor: pointer; }
-
-.tabs {
-  display: flex;
-  gap: 10px;
-  margin: 15px 0 20px;
-}
-
-.tabs button {
-  flex: 1;
-  border: none;
-  padding: 14px 8px;
-  font-weight: 700;
-  font-size: 14px;
-  border-radius: 14px;
-  color: #fff;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  transition: transform 0.1s ease;
-}
-
-.tabs button:active {
-  transform: scale(0.96);
-}
-
-/* COULEURS FIXES */
-#btn-mp {
-  background: #2563eb; /* bleu */
-}
-
-#btn-ms {
-  background: #16a34a; /* vert */
-}
-
-#btn-hist {
-  background: #f59e0b; /* orange */
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-th, td {
-  border: 1px solid #ccc;
-  padding: 6px;
-  text-align: center;
-}
-
-.ok { background: #d4edda; }
-.soon { background: #fff3cd; }
-.expired { background: #f8d7da; }
-.logo {
-  display: block;
-  margin: 20px auto 10px;
-  max-width: 100px;
-  height: auto;
-}
- .home-title {
-  text-align: center;
-  margin: 20px 0 30px;
-}
-
-.home-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  padding: 10px;
-}
-
-.home-card {
-  border-radius: 18px;
-  padding: 25px 10px;
-  text-align: center;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-  color: #fff;
-}
-
-
-.home-card:active {
-  transform: scale(0.97);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-}
-
-.home-card .icon {
-  font-size: 36px;
-  margin-bottom: 10px;
-}
-
-.home-card .label {
-  font-weight: bold;
-  font-size: 15px;
-}
-
-.tabs button.active {
-  background-clip: padding-box;
-}
- /* RESET SAFARI */
-.tab-button {
-  flex: 1;
-  border: none;
-  padding: 12px 8px;
-  font-weight: 600;
-  font-size: 14px;
-  border-radius: 12px;
-  background: #e5e7eb !important;
-  color: #374151 !important;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-}
-
-/* ACTIFS – FORCÉS */
-#btn-mp.active {
-  background: #2563eb !important;
-  color: #ffffff !important;
-}
-
-#btn-ms.active {
-  background: #16a34a !important;
-  color: #ffffff !important;
-}
-
-#btn-hist.active {
-  background: #f59e0b !important;
-  color: #ffffff !important;
-}
- /* COULEURS ACCUEIL */
-.home-card.ajout {
-  background: #2563eb;
-  color: #fff;
-}
-
-.home-card.stock {
-  background: #16a34a;
-  color: #fff;
-}
-
-.home-card.historique {
-  background: #f59e0b;
-  color: #fff;
-}
-
-.home-card.stats {
-  background: #7c3aed;
-  color: #fff;
-}
-
+section{ display:none }
 </style>
 </head>
 
 <body>
 
-<img src="logo-neige-azur.png" alt="Neige Azur" class="logo">
-
- <div id="home">
-
-  <h1 class="home-title">Gestion des stocks</h1>
+<!-- ACCUEIL -->
+<div id="home">
+  <h1>Gestion des stocks</h1>
 
   <div class="home-grid">
-
-  <div class="home-card ajout" onclick="openSection('ajout')">
-    <div class="icon">➕</div>
-    <div class="label">Ajout stock</div>
+    <div class="home-card" onclick="openSection('ajout')">➕ Ajout stock</div>
+    <div class="home-card" onclick="openSection('stock')">📦 Stock</div>
+    <div class="home-card" onclick="openSection('hist')">🧾 Historique</div>
+    <div class="home-card" onclick="alert('Stats à venir')">📊 Stats</div>
   </div>
-
-  <div class="home-card stock" onclick="openSection('stock')">
-    <div class="icon">📦</div>
-    <div class="label">Stock</div>
-  </div>
-
-  <div class="home-card historique" onclick="openSection('historique')">
-    <div class="icon">🧾</div>
-    <div class="label">Historique sorties</div>
-  </div>
-
-  <div class="home-card stats" onclick="openSection('stats')">
-    <div class="icon">📊</div>
-    <div class="label">Stats</div>
-  </div>
-
 </div>
 
- </div> <!-- FIN home -->
-
-<div id="app" style="display:none;">
+<!-- APPLICATION -->
+<div id="app">
 
 <button onclick="retourAccueil()">🏠 Accueil</button>
 
-<h1>Traçabilité matières – Neige Azur</h1>
+<!-- AJOUT -->
+<section id="section-ajout">
+<h2>Ajouter au stock</h2>
 
-<div class="tabs">
-  <button id="btn-mp" onclick="showTab('mp')">
-    Matières premières
-  </button>
-  <button id="btn-ms" onclick="showTab('ms')">
-    Matières secondaires
-  </button>
-  <button id="btn-hist" onclick="showTab('hist')">
-    Historique
-  </button>
-</div>
-
-
-<div id="tab-ajout" style="display:none;">
-
-<h3>Ajouter une matière en stock</h3>
-
-<select id="matiere">
-  <option value="Sucre">Sucre</option>
-  <option value="Sucre inverti">Sucre inverti</option>
-  <option value="Dextrose">Dextrose</option>
-  <option value="Glucose">Glucose</option>
-  <option value="Lait entier">Lait entier</option>
-  <option value="Lait 0%">Lait 0%</option>
-  <option value="Crème 35%">Crème 35%</option>
-  <option value="Jaune d'œuf">Jaune d'œuf</option>
-  <option value="Huile de coco">Huile de coco</option>
-  <option value="Stabilisateur glace">Stabilisateur glace</option>
-  <option value="Stabilisateur sorbet">Stabilisateur sorbet</option>
-  <option value="Purée de fruits">Purée de fruits</option>
-  <option value="Autre">Autre (à préciser)</option>
-</select>
-
-<input id="matiereAutre" placeholder="Préciser la matière" style="display:none">
-
-<select id="fournisseur">
-  <option value="">— Choisir un fournisseur —</option>
-  <option value="Montaigu">Montaigu</option>
-  <option value="Giraudon">Giraudon</option>
-  <option value="Fedpa">Fedpa</option>
-  <option value="Socovo">Socovo</option>
-  <option value="Rogelfruits">Rogelfruits</option>
-  <option value="Autre">Autre (à préciser)</option>
-</select>
-
-<input id="fournisseurAutre" placeholder="Préciser le fournisseur" style="display:none">
-<input id="lot" placeholder="Numéro de lot">
-
-<select id="type">
-  <option value="DLUO">DLUO</option>
-  <option value="DLC">DLC</option>
-</select>
-
+<input id="matiere" placeholder="Matière">
+<input id="fournisseur" placeholder="Fournisseur">
+<input id="lot" placeholder="Lot">
 <input id="dlc" type="date">
-<input id="quantite" type="number" placeholder="Quantité (sacs)">
+<input id="quantite" type="number" placeholder="Quantité">
 
-<button onclick="ajouterLot().catch(console.error)">➕ Ajouter au stock</button>
+<button onclick="ajouterLot()">Ajouter</button>
+</section>
 
-</div>
+<!-- STOCK -->
+<section id="section-stock">
+<h2>Stock actuel</h2>
 
-
-<div id="tab-hist" style="display:none;">
-
-<h3>Historique des sorties</h3>
-
-<select id="moisSelect">
-  <option value="">— Choisir un mois —</option>
-</select>
-
-<table>
+<table border="1" width="100%">
 <thead>
 <tr>
-<th>Date</th>
 <th>Matière</th>
 <th>Lot</th>
-<th>Quantité</th>
+<th>Qté</th>
+<th>Sortie</th>
 </tr>
 </thead>
-<tbody id="tableHistorique"></tbody>
+<tbody id="tableStock"></tbody>
 </table>
+</section>
+
+<!-- HISTORIQUE -->
+<section id="section-hist">
+<h2>Historique des sorties</h2>
+<ul id="tableHistorique"></ul>
+</section>
 
 </div>
-
-<div id="tab-ms" style="display:none;">
-  <h3>Matières secondaires</h3>
-  <p>Module à venir.</p>
-</div>
-
-<!-- Firebase -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-  import {
-    getFirestore,
-    doc,
-    getDoc,
-    setDoc,
-    onSnapshot
-  } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "TON_API_KEY",
-    authDomain: "neigeazur-stock.firebaseapp.com",
-    projectId: "neigeazur-stock",
-    storageBucket: "neigeazur-stock.appspot.com",
-    messagingSenderId: "XXXXXXXX",
-    appId: "XXXXXXXX"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.db = db;
-  window.doc = doc;
-  window.getDoc = getDoc;
-  window.setDoc = setDoc;
-  window.onSnapshot = onSnapshot;
-</script>
 
 <script>
-
 let stock = [];
-let sortiesMois = [];
-let historiqueMois = [];
-let moisActuel = new Date().getMonth();
+let historique = [];
 
-// 🔧 Références DOM (OBLIGATOIRE avec type="module")
-const matiere = document.getElementById("matiere");
-const matiereAutre = document.getElementById("matiereAutre");
-const fournisseur = document.getElementById("fournisseur");
-const fournisseurAutre = document.getElementById("fournisseurAutre");
-const lot = document.getElementById("lot");
-const type = document.getElementById("type");
-const dlc = document.getElementById("dlc");
-const quantite = document.getElementById("quantite");
+function openSection(section){
+  document.getElementById("home").style.display="none";
+  document.getElementById("app").style.display="block";
 
-const tableStock = document.getElementById("tableStock");
-const sortiesMoisListe = document.getElementById("sortiesMoisListe");
-
-async function save() {
-  const ref = doc(window.db, "neigeazur", "data");
-
-  await setDoc(
-    ref,
-    {
-      stock: stock,
-      sortiesMois: sortiesMois,
-      historiqueMois: historiqueMois,
-      moisActuel: moisActuel,
-      updatedAt: new Date()
-    },
-    { merge: true }
-  );
+  document.querySelectorAll("section").forEach(s=>s.style.display="none");
+  document.getElementById("section-"+section).style.display="block";
 }
 
-function showTab(tab){
-  document.getElementById("tab-ajout").style.display = "none";
-  document.getElementById("tab-stock").style.display = "none";
-  document.getElementById("tab-hist").style.display = "none";
-
-  document.getElementById("tab-" + tab).style.display = "block";
+function retourAccueil(){
+  document.getElementById("app").style.display="none";
+  document.getElementById("home").style.display="block";
 }
 
+function ajouterLot(){
+  const matiere = document.getElementById("matiere").value;
+  const lot = document.getElementById("lot").value;
+  const qte = Number(document.getElementById("quantite").value);
 
+  if(!matiere || !qte) return;
 
-async function ajouterLot(){
-  if(!lot.value || !quantite.value) return;
-
-  stock.unshift({
-    matiere: matiere.value === "Autre" ? matiereAutre.value : matiere.value,
-    fournisseur: fournisseur.value === "Autre" ? fournisseurAutre.value : fournisseur.value,
-    lot: lot.value,
-    type: type.value,
-    date: dlc.value || "",
-    sacs: Number(quantite.value)
-  });
-
-  save().catch(console.error);
-  afficher();
-
-  lot.value = "";
-  quantite.value = "";
+  stock.push({matiere, lot, qte});
+  afficherStock();
 }
 
-// 🔧 Exposition des fonctions pour les onclick HTML
-window.ajouterLot = ajouterLot;
-window.validerSortie = validerSortie;
-window.showTab = showTab;
- 
-function afficher(){
-  tableStock.innerHTML = "";
+function afficherStock(){
+  const tbody = document.getElementById("tableStock");
+  tbody.innerHTML="";
 
-  stock.forEach((x,i)=>{
-    tableStock.innerHTML += `
-      <tr>
-        <td>${x.matiere}</td>
-        <td>${x.fournisseur}</td>
-        <td>${x.lot}</td>
-        <td>${x.date}</td>
-        <td>${x.sacs}</td>
-        <td>
-          <input type="number" id="sortie-${i}" style="width:60px">
-          <button onclick="validerSortie(${i})">Valider</button>
-        </td>
-      </tr>
-    `;
-  });
-
-  afficherSortiesMois();
-}
-
-async function validerSortie(i){
-  const q = Number(document.getElementById("sortie-"+i).value);
-  if(!q || q > stock[i].sacs) return;
-
-  stock[i].sacs -= q;
-  sortiesMois.push({
-    date: new Date().toLocaleDateString(),
-    matiere: stock[i].matiere,
-    lot: stock[i].lot,
-    quantite: q
-  });
-
-  await save();   // ⬅️ POINT CLÉ
-  afficher();
-}
-function afficherSortiesMois(){
-  sortiesMoisListe.innerHTML = "";
-  sortiesMois.forEach(s=>{
-    sortiesMoisListe.innerHTML += `<li>${s.date} – ${s.quantite} sacs ${s.matiere}</li>`;
+  stock.forEach((s,i)=>{
+    tbody.innerHTML += `
+    <tr>
+      <td>${s.matiere}</td>
+      <td>${s.lot}</td>
+      <td>${s.qte}</td>
+      <td><button onclick="sortie(${i})">-1</button></td>
+    </tr>`;
   });
 }
 
-async function chargerDonneesFirebase() {
-  const ref = doc(window.db, "neigeazur", "data");
-  const snap = await getDoc(ref);
-
-  if (snap.exists()) {
-    const data = snap.data();
-    stock = data.stock || [];
-    sortiesMois = data.sortiesMois || [];
-    historiqueMois = data.historiqueMois || [];
-    moisActuel = data.moisActuel ?? new Date().getMonth();
-  } else {
-    await setDoc(ref, {
-      stock: [],
-      sortiesMois: [],
-      historiqueMois: [],
-      moisActuel: new Date().getMonth(),
-      updatedAt: new Date()
-    });
-  }
-
-  afficher();
-  afficherSortiesMois();
+function sortie(i){
+  stock[i].qte--;
+  historique.push(stock[i].matiere);
+  afficherStock();
 }
-
-function ecouterFirebase() {
-  const ref = doc(window.db, "neigeazur", "data");
-
-  onSnapshot(ref, (snap) => {
-    if (snap.exists()) {
-      const data = snap.data();
-      stock = data.stock || [];
-      sortiesMois = data.sortiesMois || [];
-      historiqueMois = data.historiqueMois || [];
-      moisActuel = data.moisActuel ?? new Date().getMonth();
-
-      afficher();
-      afficherSortiesMois();
-    }
-  });
-}
-
-fournisseur.addEventListener("change", () => {
-  fournisseurAutre.style.display = fournisseur.value === "Autre" ? "block" : "none";
-});
-
-matiere.addEventListener("change", () => {
-  matiereAutre.style.display = matiere.value === "Autre" ? "block" : "none";
-});
-
-function openSection(section) {
-  document.getElementById("home").style.display = "none";
-  document.getElementById("app").style.display = "block";
-
-  if (section === "ajout") showTab("ajout");
-  if (section === "stock") showTab("stock");
-  if (section === "historique") showTab("hist");
-  if (section === "stats") alert("Stats à venir");
-}
-
-
-
-function retourAccueil() {
-  document.getElementById("app").style.display = "none";
-  document.getElementById("home").style.display = "block";
-}
-
-window.addEventListener("load", () => {
-  chargerDonneesFirebase();
-  ecouterFirebase();
-});
- showTab("mp");
-
 </script>
-
-</div>
 
 </body>
 </html>
