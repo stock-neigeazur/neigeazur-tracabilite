@@ -30,6 +30,29 @@ section{ display:none }
 </head>
 
 <body>
+  <div id="app" style="display:none;">
+
+<div id="home">
+
+  <h1 class="home-title">Gestion des stocks</h1>
+
+  <div class="home-grid">
+
+    <div class="home-card ajout" onclick="openSection('mp')">
+      ➕ Ajout stock
+    </div>
+
+    <div class="home-card stock" onclick="openSection('mp')">
+      📦 Stock
+    </div>
+
+    <div class="home-card historique" onclick="openSection('hist')">
+      🧾 Historique
+    </div>
+
+  </div>
+
+</div>
 
 <!-- ACCUEIL -->
 <div id="home">
@@ -45,7 +68,7 @@ section{ display:none }
 
 <!-- APPLICATION -->
 <div id="app">
-
+  
 <button onclick="retourAccueil()">🏠 Accueil</button>
 
 <!-- AJOUT -->
@@ -158,7 +181,19 @@ function sortie(i){
   historique.push(stock[i].matiere);
   afficherStock();
 }
+  function openSection(tab) {
+  document.getElementById("home").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  showTab(tab);
+}
+
+function retourAccueil() {
+  document.getElementById("app").style.display = "none";
+  document.getElementById("home").style.display = "block";
+}
+
 </script>
+</div>
 
 </body>
 </html>
