@@ -516,14 +516,27 @@ matiere.addEventListener("change", () => {
 });
 
 function openSection(section) {
+  // cacher accueil
   document.getElementById("home").style.display = "none";
-  document.getElementById("app").style.display = "block";
 
-  if (section === "ajout") showTab("mp");
-  if (section === "stock") showTab("mp");
-  if (section === "historique") showTab("hist");
-  if (section === "stats") alert("Stats à venir");
+  // afficher app
+  const app = document.getElementById("app");
+  app.style.display = "block";
+
+  // forcer un onglet visible
+  if (section === "ajout" || section === "stock") {
+    showTab("mp");
+  }
+
+  if (section === "historique") {
+    showTab("hist");
+  }
+
+  if (section === "stats") {
+    alert("Stats à venir");
+  }
 }
+
 
 function retourAccueil() {
   document.getElementById("app").style.display = "none";
