@@ -33,44 +33,38 @@ button { cursor: pointer; }
 
 .tabs {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   margin: 15px 0 20px;
 }
 
 .tabs button {
   flex: 1;
   border: none;
-  padding: 12px 8px;
-  font-weight: 600;
+  padding: 14px 8px;
+  font-weight: 700;
   font-size: 14px;
-  border-radius: 12px;
-  background: #e5e7eb;        /* gris clair neutre */
-  color: #374151;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  transition: all 0.2s ease;
-}
-
-/* Matières premières */
-#btn-mp.active {
-  background: #2563eb;        /* bleu */
+  border-radius: 14px;
   color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: transform 0.1s ease;
 }
 
-/* Matières secondaires */
-#btn-ms.active {
-  background: #16a34a;        /* vert */
-  color: #fff;
-}
-
-/* Historique */
-#btn-hist.active {
-  background: #f59e0b;        /* orange */
-  color: #fff;
-}
-
-/* petit effet au toucher */
 .tabs button:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
+}
+
+/* COULEURS FIXES */
+#btn-mp {
+  background: #2563eb; /* bleu */
+}
+
+#btn-ms {
+  background: #16a34a; /* vert */
+}
+
+#btn-hist {
+  background: #f59e0b; /* orange */
 }
 
 table {
@@ -206,16 +200,17 @@ th, td {
 <h1>Traçabilité matières – Neige Azur</h1>
 
 <div class="tabs">
-  <button id="btn-mp" class="tab-button active" onclick="showTab('mp')">
+  <button id="btn-mp" onclick="showTab('mp')">
     Matières premières
   </button>
-  <button id="btn-ms" class="tab-button" onclick="showTab('ms')">
+  <button id="btn-ms" onclick="showTab('ms')">
     Matières secondaires
   </button>
-  <button id="btn-hist" class="tab-button" onclick="showTab('hist')">
+  <button id="btn-hist" onclick="showTab('hist')">
     Historique
   </button>
 </div>
+
 
 <div id="tab-mp">
 
@@ -377,39 +372,13 @@ async function save() {
 }
 
 function showTab(tab){
+  document.getElementById("tab-mp").style.display   = "none";
+  document.getElementById("tab-ms").style.display   = "none";
+  document.getElementById("tab-hist").style.display = "none";
 
-  document.getElementById("tab-mp").style.display   = tab === "mp"   ? "block" : "none";
-  document.getElementById("tab-hist").style.display = tab === "hist" ? "block" : "none";
-  document.getElementById("tab-ms").style.display   = tab === "ms"   ? "block" : "none";
-
-  const mp = document.getElementById("btn-mp");
-  const ms = document.getElementById("btn-ms");
-  const hist = document.getElementById("btn-hist");
-
-  [mp, ms, hist].forEach(b => {
-    b.classList.remove("active");
-    b.style.setProperty("background-color", "#e5e7eb", "important");
-    b.style.setProperty("color", "#374151", "important");
-  });
-
-  if(tab === "mp"){
-    mp.classList.add("active");
-    mp.style.setProperty("background-color", "#2563eb", "important");
-    mp.style.setProperty("color", "#ffffff", "important");
-  }
-
-  if(tab === "ms"){
-    ms.classList.add("active");
-    ms.style.setProperty("background-color", "#16a34a", "important");
-    ms.style.setProperty("color", "#ffffff", "important");
-  }
-
-  if(tab === "hist"){
-    hist.classList.add("active");
-    hist.style.setProperty("background-color", "#f59e0b", "important");
-    hist.style.setProperty("color", "#ffffff", "important");
-  }
+  document.getElementById("tab-" + tab).style.display = "block";
 }
+
 
 async function ajouterLot(){
   if(!lot.value || !quantite.value) return;
