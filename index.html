@@ -982,6 +982,10 @@ function editerSortie(index) {
     <button onclick="afficherSortiesMois()">❌</button>
   `;
 }
+
+window.editerSortie = editerSortie;
+
+
  
 async function validerEditSortie(index) {
 
@@ -990,7 +994,6 @@ async function validerEditSortie(index) {
 
   if (!dateInput || !qteInput || qteInput <= 0) return;
 
-  // remise au format français
   const d = new Date(dateInput);
   const dateFR = d.toLocaleDateString("fr-FR");
 
@@ -1000,7 +1003,10 @@ async function validerEditSortie(index) {
   await save();
   afficherSortiesMois();
 }
- 
+
+window.validerEditSortie = validerEditSortie;
+
+
 function formatDateISO(dateFR) {
   const [d, m, y] = dateFR.split("/");
   return `${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`;
