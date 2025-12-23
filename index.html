@@ -554,10 +554,12 @@ async function ajouterLot(){
   if (fournisseur === "promocash") {
     matiere = document.getElementById("matiereMS-promocash").value;
   }
+  
+const type = document.getElementById("typeMS").value;
+const date = document.getElementById("dateMS").value;
+const qte = document.getElementById("quantiteMS").value;
+const seuil = document.getElementById("seuilMS").value;
 
-  const lotMS = document.getElementById("lotMS").value;
-  const qte = document.getElementById("quantiteMS").value;
-  const seuilMS = document.getElementById("seuilMS").value;
 
   if (!fournisseur || !matiere || !qte) return;
 
@@ -566,10 +568,11 @@ async function ajouterLot(){
     matiere: matiere,
     fournisseur: fournisseur,
     lot: lotMS,
-    type: "",
-    date: "",
-    sacs: Number(qte),
-    seuil: Number(seuilMS) || 0
+    type: type,
+date: date,
+sacs: Number(qte),
+seuil: Number(seuil) || 0
+
   });
 }
 
@@ -833,15 +836,23 @@ const blocsProduitsMS = {
   promocash: document.getElementById("produits-promocash")
 };
 
+const champsMS = document.getElementById("champs-ms");
+
 fournisseurMS.addEventListener("change", () => {
+
   // cacher tous les blocs produits
   Object.values(blocsProduitsMS).forEach(b => b.style.display = "none");
 
-  // afficher uniquement celui du fournisseur choisi
+  // cacher les champs communs
+  champsMS.style.display = "none";
+
+  // afficher produit + champs si fournisseur valide
   if (blocsProduitsMS[fournisseurMS.value]) {
     blocsProduitsMS[fournisseurMS.value].style.display = "block";
+    champsMS.style.display = "block";
   }
 });
+
 
 </script>
 
