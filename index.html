@@ -651,17 +651,23 @@ function afficherSortiesMois(){
   if (!sortiesMoisListe) return;
 
   sortiesMoisListe.innerHTML = "";
- sortiesMois.forEach(s=>{
-  sortiesMoisListe.innerHTML += `
-    <li>
-      ${s.date} – 
-      ${s.quantite} sacs – 
-      ${s.matiere} | 
-      Lot : ${s.lot || "—"} | 
-      ${s.type || ""} : ${s.dlc || "—"}
-    </li>
-  `;
-});
+[...sortiesMois]
+  .sort((a, b) => {
+    const da = new Date(a.date.split("/").reverse().join("-"));
+    const db = new Date(b.date.split("/").reverse().join("-"));
+    return db - da; // décroissant
+  })
+  .forEach(s => {
+    sortiesMoisListe.innerHTML += `
+      <li>
+        ${s.date} – 
+        ${s.quantite} sacs – 
+        ${s.matiere} | 
+        Lot : ${s.lot || "—"} | 
+        ${s.type || ""} : ${s.dlc || "—"}
+      </li>
+    `;
+  });
 }
 
 
