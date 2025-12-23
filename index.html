@@ -364,6 +364,9 @@ input#seuil {
   <h4>Matières les plus utilisées</h4>
   <ul id="stats-matieres"></ul>
 
+ <h4>📦 Fournisseurs</h4>
+<ul id="stats-fournisseurs"></ul>
+
 </div>
 
 
@@ -432,6 +435,26 @@ const quantite = document.getElementById("quantite");
 const tableStock = document.getElementById("tableStock");
 const sortiesMoisListe = document.getElementById("sortiesMoisListe");
 const seuil = document.getElementById("seuil");
+function estExpire(lot){
+  if(!lot.date) return false;
+
+  const aujourdHui = new Date();
+  const dateLot = new Date(lot.date);
+
+  // DLC stricte
+  if(lot.type === "DLC"){
+    return dateLot < aujourdHui;
+  }
+
+  // DLUO avec tolérance de 30 jours
+  if(lot.type === "DLUO"){
+    const tol = new Date(dateLot);
+    tol.setDate(tol.getDate() + 30);
+    return tol < aujourdHui;
+  }
+
+  return false;
+}
 
 async function save() {
   const ref = doc(window.db, "neigeazur", "data");
@@ -497,26 +520,30 @@ function afficher(){
 
   tableStock.innerHTML = "";
 
-  stock.forEach((x, i) => {
+ stock.forEach((x,i)=>{
+  let classe = "";
 
-    let classe = "";
-    if (x.seuil && x.sacs <= x.seuil) classe = "stock-bas";
-    if (x.seuil && x.sacs <= x.seuil / 2) classe = "stock-critique";
+  if(estExpire(x)){
+    classe = "expired";
+  } else if(x.sacs <= (x.seuil || 0)){
+    classe = "stock-critique";
+  }
 
-    tableStock.innerHTML += `
-      <tr class="${classe}">
-        <td>${x.matiere}</td>
-        <td>${x.fournisseur}</td>
-        <td>${x.lot}</td>
-        <td>${x.date}</td>
-        <td>${x.sacs}</td>
-        <td>
-          <input type="number" id="sortie-${i}" style="width:60px">
-          <button onclick="validerSortie(${i})">Valider</button>
-        </td>
-      </tr>
-    `;
-  });
+  tableStock.innerHTML += `
+    <tr class="${classe}">
+      <td>${x.matiere}</td>
+      <td>${x.fournisseur}</td>
+      <td>${x.lot}</td>
+      <td>${x.date}</td>
+      <td>${x.sacs}</td>
+      <td>
+        <input type="number" id="sortie-${i}" style="width:60px">
+        <button onclick="validerSortie(${i})">Valider</button>
+      </td>
+    </tr>
+  `;
+});
+
 
   afficherSortiesMois();
 }
@@ -578,6 +605,23 @@ function calculerStats(){
     .forEach(([matiere, qte]) => {
       ul.innerHTML += `<li>${matiere} : ${qte} sacs</li>`;
     });
+}
+const ulF = document.getElementById("stats-fournisseurs");
+if(ulF){
+  ulF.innerHTML = "";
+
+  const fournisseurs = statsFournisseurs();
+
+  Object.entries(fournisseurs).forEach(([nom, data])=>{
+    ulF.innerHTML += `
+      <li>
+        <strong>${nom}</strong> :
+        ${data.lots} lots,
+        ${data.sacs} sacs,
+        ${data.expires} périmés
+      </li>
+    `;
+  });
 }
 
 
@@ -673,6 +717,28 @@ function verifierAlertes() {
       console.warn(`⚠️ Stock bas : ${matiere}`);
     }
   });
+}
+function statsFournisseurs(){
+  const stats = {};
+
+  stock.forEach(lot=>{
+    if(!stats[lot.fournisseur]){
+      stats[lot.fournisseur] = {
+        lots: 0,
+        expires: 0,
+        sacs: 0
+      };
+    }
+
+    stats[lot.fournisseur].lots++;
+    stats[lot.fournisseur].sacs += lot.sacs;
+
+    if(estExpire(lot)){
+      stats[lot.fournisseur].expires++;
+    }
+  });
+
+  return stats;
 }
 
 window.addEventListener("load", () => {
