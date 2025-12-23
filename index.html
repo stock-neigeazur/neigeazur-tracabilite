@@ -792,7 +792,11 @@ function openSection(section) {
     if (el) el.style.display = "none";
   });
 
-  // afficher l’onglet demandé
+  // 🔥 RESET OBLIGATOIRE quand on ouvre Ajout stock
+  if (section === "ajout") {
+    resetAjoutStock();   // ⬅️ LA LIGNE QUI MANQUAIT
+  }
+
   const target = document.getElementById("tab-" + section);
   if (!target) {
     console.error("Onglet introuvable :", section);
@@ -804,9 +808,14 @@ function openSection(section) {
   if (section === "historique") {
     afficherHistorique();
   }
+
+  if (section === "stats") {
+    calculerStats();
+  }
 }
 
 window.openSection = openSection;
+
 
 function retourAccueil() {
   document.getElementById("app").style.display = "none";
