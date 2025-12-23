@@ -175,6 +175,20 @@ th, td {
   background: #7c3aed;
   color: #fff;
 }
+.stats-box {
+  background: #f3f4f6;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.stats-box p {
+  margin: 6px 0;
+}
+
+#stats-matieres li {
+  margin: 4px 0;
+}
 
 </style>
 </head>
@@ -320,10 +334,20 @@ th, td {
 
 </div>
 
-<div id="tab-ms" style="display:none;">
-  <h3>Matières secondaires</h3>
-  <p>Module à venir.</p>
+<div id="tab-stats" style="display:none;">
+
+  <h3>📊 Statistiques</h3>
+
+  <div class="stats-box">
+    <p><strong>Total sorties ce mois :</strong> <span id="stat-total-sorties">0</span> sacs</p>
+    <p><strong>Nombre de mouvements :</strong> <span id="stat-nb-sorties">0</span></p>
+  </div>
+
+  <h4>Matières les plus utilisées</h4>
+  <ul id="stats-matieres"></ul>
+
 </div>
+
 
 <!-- Firebase -->
 <script type="module">
@@ -392,11 +416,16 @@ async function save() {
 }
 
 function showTab(tab){
-  document.getElementById("tab-mp").style.display   = "none";
-  document.getElementById("tab-ms").style.display   = "none";
+  document.getElementById("tab-mp").style.display = "none";
+  document.getElementById("tab-ms").style.display = "none";
   document.getElementById("tab-hist").style.display = "none";
+  document.getElementById("tab-stats").style.display = "none";
 
   document.getElementById("tab-" + tab).style.display = "block";
+
+  if(tab === "stats"){
+    calculerStats();
+  }
 }
 
 
@@ -467,6 +496,27 @@ function afficherSortiesMois(){
     sortiesMoisListe.innerHTML += `<li>${s.date} – ${s.quantite} sacs ${s.matiere}</li>`;
   });
 }
+function calculerStats(){
+  let total = 0;
+  let compteur = {};
+  
+  sortiesMois.forEach(s => {
+    total += s.quantite;
+    compteur[s.matiere] = (compteur[s.matiere] || 0) + s.quantite;
+  });
+
+  document.getElementById("stat-total-sorties").textContent = total;
+  document.getElementById("stat-nb-sorties").textContent = sortiesMois.length;
+
+  const ul = document.getElementById("stats-matieres");
+  ul.innerHTML = "";
+
+  Object.entries(compteur)
+    .sort((a,b) => b[1] - a[1])
+    .forEach(([matiere, qte]) => {
+      ul.innerHTML += `<li>${matiere} : ${qte} sacs</li>`;
+    });
+}
 
 async function chargerDonneesFirebase() {
   const ref = doc(window.db, "neigeazur", "data");
@@ -534,9 +584,9 @@ function openSection(section) {
     showTab("hist");
   }
 
-  if (section === "stats") {
-    alert("Stats à venir");
-  }
+if (section === "stats") {
+  showTab("stats");
+}
 }
 
 
