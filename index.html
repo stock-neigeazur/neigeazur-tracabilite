@@ -994,22 +994,18 @@ async function validerEditSortie(index) {
   const nouvelleQte = Number(
     document.getElementById("edit-qte-" + index).value
   );
-const hist = historiqueMois.find(h =>
-  h.date === sortie.date &&
-  h.matiere === sortie.matiere &&
-  h.lot === sortie.lot
-);
-
-if (hist) {
-  hist.quantite = nouvelleQte;
-}
 
   if (!nouvelleQte || nouvelleQte <= 0) return;
+
+  // 🔁 gestion de la date
+  const nouvelleDateISO = document.getElementById("edit-date-" + index).value;
+  if (nouvelleDateISO) {
+    sortie.date = new Date(nouvelleDateISO).toLocaleDateString("fr-FR");
+  }
 
   const ancienneQte = sortie.quantite;
   const delta = ancienneQte - nouvelleQte;
 
-  // 🔁 retrouver le lot concerné dans le stock
   const lotStock = stock.find(l =>
     l.matiere === sortie.matiere &&
     l.lot === sortie.lot
@@ -1020,31 +1016,29 @@ if (hist) {
     return;
   }
 
-  // ➕ remise au stock si on a trop sorti
-  if (delta > 0) {
+  if (delta > 0) lotStock.sacs += delta;
+  if (delta < 0) {
+    if (lotStock.sacs + delta < 0) {
+      alert("Stock insuffisant");
+      return;
+    }
     lotStock.sacs += delta;
   }
 
-  // ➖ retrait supplémentaire si on n’avait pas assez sorti
-  if (delta < 0) {
-    if (lotStock.sacs + delta < 0) {
-      alert("Stock insuffisant pour corriger la sortie");
-      return;
-    }
-    lotStock.sacs += delta; // delta négatif
-  }
-
-  // ✏️ mise à jour de la sortie
   sortie.quantite = nouvelleQte;
+
+  const hist = historiqueMois.find(h =>
+    h.date === sortie.date &&
+    h.matiere === sortie.matiere &&
+    h.lot === sortie.lot
+  );
+  if (hist) hist.quantite = nouvelleQte;
 
   await save();
   afficher();
   afficherSortiesMois();
 }
-const nouvelleDateISO = document.getElementById("edit-date-" + index).value;
-if (nouvelleDateISO) {
-  sortie.date = new Date(nouvelleDateISO).toLocaleDateString("fr-FR");
-}
+
 
 window.validerEditSortie = validerEditSortie;
 
