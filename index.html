@@ -260,73 +260,77 @@ input#seuil {
 </div>
 
 
-<div id="tab-mp">...</div>
+<div id="tab-mp" style="display:none;">
+
+  <h3>Ajouter un lot</h3>
+
+  <select id="matiere">
+    <option value="Sucre">Sucre</option>
+    <option value="Sucre inverti">Sucre inverti</option>
+    <option value="Dextrose">Dextrose</option>
+    <option value="Glucose">Glucose</option>
+    <option value="Lait entier">Lait entier</option>
+    <option value="Lait 0%">Lait 0%</option>
+    <option value="Crème 35%">Crème 35%</option>
+    <option value="Jaune d'œuf">Jaune d'œuf</option>
+    <option value="Huile de coco">Huile de coco</option>
+    <option value="Stabilisateur glace">Stabilisateur glace</option>
+    <option value="Stabilisateur sorbet">Stabilisateur sorbet</option>
+    <option value="Purée de fruits">Purée de fruits</option>
+    <option value="Autre">Autre (à préciser)</option>
+  </select>
+
+  <input id="matiereAutre" placeholder="Préciser la matière" style="display:none">
+
+  <select id="fournisseur">
+    <option value="">— Choisir un fournisseur —</option>
+    <option value="Montaigu">Montaigu</option>
+    <option value="Giraudon">Giraudon</option>
+    <option value="Fedpa">Fedpa</option>
+    <option value="Socovo">Socovo</option>
+    <option value="Rogelfruits">Rogelfruits</option>
+    <option value="Autre">Autre (à préciser)</option>
+  </select>
+
+  <input id="fournisseurAutre" placeholder="Préciser le fournisseur" style="display:none">
+  <input id="lot" placeholder="Numéro de lot">
+
+  <select id="type">
+    <option value="DLUO">DLUO</option>
+    <option value="DLC">DLC</option>
+  </select>
+
+  <input id="dlc" type="date">
+  <input id="quantite" type="number" placeholder="Quantité (sacs)">
+  <input id="seuil" type="number" placeholder="Seuil d’alerte (sacs)">
+
+  <button onclick="ajouterLot().catch(console.error)">Ajouter</button>
+
+  <h3>Stock actuel</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Matière</th>
+        <th>Fournisseur</th>
+        <th>Lot</th>
+        <th>DLC / DLUO</th>
+        <th>Quantité</th>
+        <th>Sortie</th>
+      </tr>
+    </thead>
+    <tbody id="tableStock"></tbody>
+  </table>
+
+  <h3>Sorties du mois en cours</h3>
+  <ul id="sortiesMoisListe"></ul>
+
+</div>
+
 <div id="tab-hist" style="display:none;">...</div>
 <div id="tab-stats" style="display:none;">...</div>
 
 
-<h3>Ajouter un lot</h3>
-
-<select id="matiere">
-  <option value="Sucre">Sucre</option>
-  <option value="Sucre inverti">Sucre inverti</option>
-  <option value="Dextrose">Dextrose</option>
-  <option value="Glucose">Glucose</option>
-  <option value="Lait entier">Lait entier</option>
-  <option value="Lait 0%">Lait 0%</option>
-  <option value="Crème 35%">Crème 35%</option>
-  <option value="Jaune d'œuf">Jaune d'œuf</option>
-  <option value="Huile de coco">Huile de coco</option>
-  <option value="Stabilisateur glace">Stabilisateur glace</option>
-  <option value="Stabilisateur sorbet">Stabilisateur sorbet</option>
-  <option value="Purée de fruits">Purée de fruits</option>
-  <option value="Autre">Autre (à préciser)</option>
-</select>
-
-<input id="matiereAutre" placeholder="Préciser la matière" style="display:none">
-
-<select id="fournisseur">
-  <option value="">— Choisir un fournisseur —</option>
-  <option value="Montaigu">Montaigu</option>
-  <option value="Giraudon">Giraudon</option>
-  <option value="Fedpa">Fedpa</option>
-  <option value="Socovo">Socovo</option>
-  <option value="Rogelfruits">Rogelfruits</option>
-  <option value="Autre">Autre (à préciser)</option>
-</select>
-
-<input id="fournisseurAutre" placeholder="Préciser le fournisseur" style="display:none">
-<input id="lot" placeholder="Numéro de lot">
-
-<select id="type">
-  <option value="DLUO">DLUO</option>
-  <option value="DLC">DLC</option>
-</select>
-
-<input id="dlc" type="date">
-<input id="quantite" type="number" placeholder="Quantité (sacs)">
-<input id="seuil" type="number" placeholder="Seuil d’alerte (sacs)">
-
-<button onclick="ajouterLot().catch(console.error)">Ajouter</button>
-
-<h3>Stock actuel</h3>
-
-<table>
-<thead>
-<tr>
-<th>Matière</th>
-<th>Fournisseur</th>
-<th>Lot</th>
-<th>DLC / DLUO</th>
-<th>Quantité</th>
-<th>Sortie</th>
-</tr>
-</thead>
-<tbody id="tableStock"></tbody>
-</table>
-
-<h3>Sorties du mois en cours</h3>
-<ul id="sortiesMoisListe"></ul>
 
 </div>
 
