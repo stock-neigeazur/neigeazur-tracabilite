@@ -756,11 +756,16 @@ function openSection(section) {
     if(el) el.style.display = "none";
   });
 
-  if(section === "ajout") showTab("ajout");
+  if(section === "ajout") {
+    resetAjoutStock();   // ⬅️ ICI
+    showTab("ajout");
+  }
+
   if(section === "stock") showTab("stock");
   if(section === "historique") showTab("hist");
   if(section === "stats") showTab("stats");
 }
+
 
 
 function retourAccueil() {
@@ -852,6 +857,23 @@ fournisseurMS.addEventListener("change", () => {
     champsMS.style.display = "block";
   }
 });
+ 
+function resetAjoutStock() {
+  // reset selects
+  document.getElementById("type-matiere").value = "";
+  document.getElementById("matiere").value = "";
+  document.getElementById("fournisseur").value = "";
+
+  // reset inputs
+  document.getElementById("lot").value = "";
+  document.getElementById("dlc").value = "";
+  document.getElementById("quantite").value = "";
+  document.getElementById("seuil").value = "";
+
+  // cacher tous les blocs conditionnels
+  document.getElementById("bloc-mp").style.display = "none";
+  document.getElementById("bloc-ms").style.display = "none";
+}
 
 
 </script>
