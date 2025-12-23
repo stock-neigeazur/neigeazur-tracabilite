@@ -646,14 +646,12 @@ function afficher(){
 
 
 
-function afficherSortiesMois(){
-
+function afficherSortiesMois() {
   if (!sortiesMoisListe) return;
 
   sortiesMoisListe.innerHTML = "";
 
   [...sortiesMois]
-    .map((s, i) => ({ ...s, _index: i }))
     .sort((a, b) => {
       const da = new Date(a.date.split("/").reverse().join("-"));
       const db = new Date(b.date.split("/").reverse().join("-"));
@@ -661,19 +659,20 @@ function afficherSortiesMois(){
     })
     .forEach(s => {
       sortiesMoisListe.innerHTML += `
-        <li id="sortie-${s._index}">
+        <li id="sortie-${s.id}">
           <span>
             ${s.date} – 
             ${s.quantite} sacs – 
             ${s.matiere} |
-            Lot : ${s.lot || "—"} |
-            ${s.type || ""} : ${s.dlc || "—"}
+            Lot : ${s.lot} |
+            ${s.type} : ${s.dlc}
           </span>
-          <button onclick="editerSortie(${s._index})">✏️</button>
+          <button onclick="editerSortie(${s.id})">✏️</button>
         </li>
       `;
     });
 }
+
 
 
 
@@ -684,6 +683,7 @@ async function validerSortie(i){
 
   stock[i].sacs -= q;
 sortiesMois.push({
+  id: Date.now(), // ⬅️ ID UNIQUE
   date: new Date().toLocaleDateString(),
   matiere: stock[i].matiere,
   lot: stock[i].lot || "SANS LOT",
@@ -691,6 +691,7 @@ sortiesMois.push({
   type: stock[i].type,
   quantite: q
 });
+
 
 historiqueMois.push({
  date: new Date().toLocaleDateString(),
@@ -969,42 +970,33 @@ function resetAjoutStock() {
   });
 }
  
-function editerSortie(index) {
-  const s = sortiesMois[index];
+function editerSortie(id) {
+  const sortie = sortiesMois.find(s => s.id === id);
+  if (!sortie) return;
 
-  const li = document.getElementById("sortie-" + index);
+  const li = document.getElementById("sortie-" + id);
   if (!li) return;
 
   li.innerHTML = `
-    <input type="date" id="edit-date-${index}" value="${formatDateISO(s.date)}">
-    <input type="number" id="edit-qte-${index}" value="${s.quantite}" style="width:70px">
-    <button onclick="validerEditSortie(${index})">💾</button>
+    <input type="number" id="edit-qte-${id}" value="${sortie.quantite}" style="width:70px">
+    <button onclick="validerEditSortie(${id})">💾</button>
     <button onclick="afficherSortiesMois()">❌</button>
   `;
 }
+
 
 window.editerSortie = editerSortie;
 
 
  
-async function validerEditSortie(index) {
+async function validerEditSortie(id) {
+  const sortie = sortiesMois.find(s => s.id === id);
+  if (!sortie) return;
 
-  const sortie = sortiesMois[index];
-
-  const nouvelleQte = Number(
-    document.getElementById("edit-qte-" + index).value
-  );
-
+  const nouvelleQte = Number(document.getElementById("edit-qte-" + id).value);
   if (!nouvelleQte || nouvelleQte <= 0) return;
 
-  // 🔁 gestion de la date
-  const nouvelleDateISO = document.getElementById("edit-date-" + index).value;
-  if (nouvelleDateISO) {
-    sortie.date = new Date(nouvelleDateISO).toLocaleDateString("fr-FR");
-  }
-
-  const ancienneQte = sortie.quantite;
-  const delta = ancienneQte - nouvelleQte;
+  const delta = sortie.quantite - nouvelleQte;
 
   const lotStock = stock.find(l =>
     l.matiere === sortie.matiere &&
@@ -1012,27 +1004,18 @@ async function validerEditSortie(index) {
   );
 
   if (!lotStock) {
-    alert("Lot d'origine introuvable dans le stock");
+    alert("Lot d'origine introuvable");
     return;
   }
 
-  if (delta > 0) lotStock.sacs += delta;
-  if (delta < 0) {
-    if (lotStock.sacs + delta < 0) {
-      alert("Stock insuffisant");
-      return;
-    }
-    lotStock.sacs += delta;
+  // remise ou retrait stock
+  lotStock.sacs += delta;
+  if (lotStock.sacs < 0) {
+    alert("Stock insuffisant");
+    return;
   }
 
   sortie.quantite = nouvelleQte;
-
-  const hist = historiqueMois.find(h =>
-    h.date === sortie.date &&
-    h.matiere === sortie.matiere &&
-    h.lot === sortie.lot
-  );
-  if (hist) hist.quantite = nouvelleQte;
 
   await save();
   afficher();
