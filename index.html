@@ -652,6 +652,7 @@ function afficherSortiesMois() {
   sortiesMoisListe.innerHTML = "";
 
   [...sortiesMois]
+    .map((s, i) => ({ ...s, _index: i }))
     .sort((a, b) => {
       const da = new Date(a.date.split("/").reverse().join("-"));
       const db = new Date(b.date.split("/").reverse().join("-"));
@@ -659,21 +660,20 @@ function afficherSortiesMois() {
     })
     .forEach(s => {
       sortiesMoisListe.innerHTML += `
-        <li id="sortie-${s.id}">
+        <li id="sortie-${s._index}">
           <span>
             ${s.date} – 
             ${s.quantite} sacs – 
             ${s.matiere} |
-            Lot : ${s.lot} |
-            ${s.type} : ${s.dlc}
+            Lot : ${s.lot || "—"} |
+            ${s.type || ""} : ${s.dlc || "—"}
           </span>
-          <button onclick="editerSortie(${s.id})">✏️</button>
+          <button onclick="editerSortie(${s._index})">✏️</button>
+          <button onclick="supprimerSortie(${s._index})">🗑️</button>
         </li>
       `;
     });
 }
-
-
 
 
 
@@ -1046,6 +1046,44 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+async function supprimerSortie(index) {
+  const sortie = sortiesMois[index];
+  if (!sortie) return;
+
+  if (!confirm("Supprimer cette sortie et réattribuer le stock ?")) return;
+
+  // retrouver le lot dans le stock
+  const lotStock = stock.find(l =>
+    l.matiere === sortie.matiere &&
+    l.lot === sortie.lot
+  );
+
+  if (!lotStock) {
+    alert("Lot d'origine introuvable dans le stock");
+    return;
+  }
+
+  // ➕ réattribuer la quantité supprimée
+  lotStock.sacs += sortie.quantite;
+
+  // ❌ supprimer la sortie du mois
+  sortiesMois.splice(index, 1);
+
+  // ❌ supprimer aussi de l’historique
+  historiqueMois = historiqueMois.filter(h =>
+    !(
+      h.date === sortie.date &&
+      h.matiere === sortie.matiere &&
+      h.lot === sortie.lot &&
+      h.quantite === sortie.quantite
+    )
+  );
+
+  await save();
+  afficher();
+  afficherSortiesMois();
+}
+window.supprimerSortie = supprimerSortie;
 
 
 </script>
