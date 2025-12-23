@@ -651,9 +651,17 @@ function afficherSortiesMois(){
   if (!sortiesMoisListe) return;
 
   sortiesMoisListe.innerHTML = "";
-  sortiesMois.forEach(s=>{
-    sortiesMoisListe.innerHTML += `<li>${s.date} – ${s.quantite} sacs ${s.matiere}</li>`;
-  });
+ sortiesMois.forEach(s=>{
+  sortiesMoisListe.innerHTML += `
+    <li>
+      ${s.date} – 
+      ${s.quantite} sacs – 
+      ${s.matiere} | 
+      Lot : ${s.lot || "—"} | 
+      ${s.type || ""} : ${s.dlc || "—"}
+    </li>
+  `;
+});
 }
 
 
@@ -663,16 +671,21 @@ async function validerSortie(i){
   if(!q || q > stock[i].sacs) return;
 
   stock[i].sacs -= q;
-  sortiesMois.push({
-    date: new Date().toLocaleDateString(),
-    matiere: stock[i].matiere,
-    lot: stock[i].lot,
-    quantite: q
-  });
-historiqueMois.push({
+sortiesMois.push({
   date: new Date().toLocaleDateString(),
   matiere: stock[i].matiere,
   lot: stock[i].lot,
+  dlc: stock[i].date,
+  type: stock[i].type,
+  quantite: q
+});
+
+historiqueMois.push({
+ date: new Date().toLocaleDateString(),
+  matiere: stock[i].matiere,
+  lot: stock[i].lot,
+  dlc: stock[i].date,
+  type: stock[i].type,
   quantite: q
 });
   await save();   // ⬅️ POINT CLÉ
