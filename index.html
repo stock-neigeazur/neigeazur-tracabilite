@@ -260,7 +260,7 @@ input#seuil {
 </div>
 
 
-<div id="tab-mp" style="display:none;">
+<div id="tab-ajout" style="display:none;">
 
   <h3>Ajouter un lot</h3>
 
@@ -306,6 +306,8 @@ input#seuil {
 
   <button onclick="ajouterLot().catch(console.error)">Ajouter</button>
 
+  <div id="tab-stock" style="display:none;">
+
   <h3>Stock actuel</h3>
 
   <table>
@@ -326,6 +328,7 @@ input#seuil {
   <ul id="sortiesMoisListe"></ul>
 
 </div>
+
 
 <div id="tab-hist" style="display:none;">...</div>
 <div id="tab-stats" style="display:none;">...</div>
@@ -477,7 +480,7 @@ async function save() {
 }
 
 function showTab(tab){
-  ["mp","ms","hist","stats"].forEach(t => {
+  ["ajout","stock","hist","stats"].forEach(t => {
     const el = document.getElementById("tab-" + t);
     if(el) el.style.display = "none";
   });
@@ -489,7 +492,6 @@ function showTab(tab){
     calculerStats();
   }
 }
-
 
 
 async function ajouterLot(){
@@ -680,23 +682,18 @@ matiere.addEventListener("change", () => {
 
 function openSection(section) {
 
-  // cacher l’accueil
   document.getElementById("home").style.display = "none";
-
-  // afficher l’app
   document.getElementById("app").style.display = "block";
 
-  // toujours cacher tous les tabs
-  ["mp", "ms", "hist", "stats"].forEach(t => {
+  ["ajout","stock","hist","stats"].forEach(t => {
     const el = document.getElementById("tab-" + t);
-    if (el) el.style.display = "none";
+    if(el) el.style.display = "none";
   });
 
-  // afficher le bon onglet
-  if (section === "ajout") showTab("mp");
-  if (section === "stock") showTab("mp");
-  if (section === "historique") showTab("hist");
-  if (section === "stats") showTab("stats");
+  if(section === "ajout") showTab("ajout");
+  if(section === "stock") showTab("stock");
+  if(section === "historique") showTab("hist");
+  if(section === "stats") showTab("stats");
 }
 
 
