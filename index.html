@@ -400,6 +400,21 @@ let stock = [];
 let sortiesMois = [];
 let historiqueMois = [];
 let moisActuel = new Date().getMonth();
+// 🔔 Seuils d'alerte par matière (en sacs)
+const seuils = {
+  "Sucre": 5,
+  "Sucre inverti": 3,
+  "Dextrose": 3,
+  "Glucose": 3,
+  "Lait entier": 4,
+  "Lait 0%": 4,
+  "Crème 35%": 3,
+  "Jaune d'œuf": 2,
+  "Huile de coco": 2,
+  "Stabilisateur glace": 1,
+  "Stabilisateur sorbet": 1,
+  "Purée de fruits": 5
+};
 
 // 🔧 Références DOM (OBLIGATOIRE avec type="module")
 const matiere = document.getElementById("matiere");
@@ -474,21 +489,25 @@ window.validerSortie = validerSortie;
 window.showTab = showTab;
  
 function afficher(){
-  const alerte = x.seuil > 0 && x.sacs <= x.seuil;
+  tableStock.innerHTML = "";
 
-tableStock.innerHTML += `
-<tr class="${alerte ? 'expired' : ''}">
-  <td>${x.matiere}</td>
-  <td>${x.fournisseur}</td>
-  <td>${x.lot}</td>
-  <td>${x.date}</td>
-  <td>${x.sacs}</td>
-  <td>
-    <input type="number" id="sortie-${i}" style="width:60px">
-    <button onclick="validerSortie(${i})">Valider</button>
-  </td>
-</tr>
-`;
+  stock.forEach((x,i)=>{
+    tableStock.innerHTML += `
+      <tr>
+        <td>${x.matiere}</td>
+        <td>${x.fournisseur}</td>
+        <td>${x.lot}</td>
+        <td>${x.date}</td>
+        <td>${x.sacs}</td>
+        <td>
+          <input type="number" id="sortie-${i}" style="width:60px">
+          <button onclick="validerSortie(${i})">Valider</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
 
 
   afficherSortiesMois();
@@ -612,6 +631,24 @@ if (section === "stats") {
 function retourAccueil() {
   document.getElementById("app").style.display = "none";
   document.getElementById("home").style.display = "block";
+}
+function stockParMatiere() {
+  const total = {};
+
+  stock.forEach(lot => {
+    total[lot.matiere] = (total[lot.matiere] || 0) + lot.sacs;
+  });
+
+  return total;
+}
+function verifierAlertes() {
+  const total = stockParMatiere();
+
+  Object.entries(seuils).forEach(([matiere, seuil]) => {
+    if ((total[matiere] || 0) <= seuil) {
+      console.warn(`⚠️ Stock bas : ${matiere}`);
+    }
+  });
 }
 
 window.addEventListener("load", () => {
