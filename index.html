@@ -250,7 +250,15 @@ input#seuil {
 <div id="tab-ajout" style="display:none;">
 
   <h3>Ajouter un lot</h3>
+ 
+<select id="categorie">
+  <option value="">— Type de matière —</option>
+  <option value="mp">Matière première</option>
+  <option value="ms">Matière secondaire</option>
+</select>
 
+ <div id="bloc-mp" style="display:none;">
+  
   <select id="matiere">
     <option value="Sucre">Sucre</option>
     <option value="Sucre inverti">Sucre inverti</option>
@@ -290,6 +298,31 @@ input#seuil {
   <input id="dlc" type="date">
   <input id="quantite" type="number" placeholder="Quantité (sacs)">
   <input id="seuil" type="number" placeholder="Seuil d’alerte (sacs)">
+  
+</div>
+
+ <div id="bloc-ms" style="display:none;">
+
+  <select id="matiereMS">
+    <option value="Bac plastique">Bac plastique</option>
+    <option value="Carton">Carton</option>
+    <option value="Film alimentaire">Film alimentaire</option>
+    <option value="Couvercle">Couvercle</option>
+    <option value="Étiquette">Étiquette</option>
+  </select>
+
+  <select id="fournisseurMS">
+    <option value="Transgourmet">Transgourmet</option>
+    <option value="Metro">Metro</option>
+    <option value="Promocash">Promocash</option>
+    <option value="Autre">Autre</option>
+  </select>
+
+  <input id="lotMS" placeholder="Numéro de lot">
+  <input id="quantiteMS" type="number" placeholder="Quantité">
+  <input id="seuilMS" type="number" placeholder="Seuil d’alerte">
+
+</div>
 
   <button onclick="ajouterLot().catch(console.error)">Ajouter</button>
 </div>
@@ -474,25 +507,47 @@ function showTab(tab) {
 
 
 async function ajouterLot(){
-  if(!lot.value || !quantite.value) return;
 
- stock.unshift({
-  matiere: matiere.value === "Autre" ? matiereAutre.value : matiere.value,
-  fournisseur: fournisseur.value === "Autre" ? fournisseurAutre.value : fournisseur.value,
-  lot: lot.value,
-  type: type.value,
-  date: dlc.value || "",
-  sacs: Number(quantite.value),
-  seuil: Number(seuil.value) || 0   // ⬅️ AJOUT
-});
+  if(categorie.value === "mp"){
+    if(!lot.value || !quantite.value) return;
 
+    stock.unshift({
+      categorie: "MP",
+      matiere: matiere.value === "Autre" ? matiereAutre.value : matiere.value,
+      fournisseur: fournisseur.value === "Autre" ? fournisseurAutre.value : fournisseur.value,
+      lot: lot.value,
+      type: type.value,
+      date: dlc.value || "",
+      sacs: Number(quantite.value),
+      seuil: Number(seuil.value) || 0
+    });
+  }
 
-  save().catch(console.error);
+  if(categorie.value === "ms"){
+    const mat = document.getElementById("matiereMS").value;
+    const four = document.getElementById("fournisseurMS").value;
+    const lotMS = document.getElementById("lotMS").value;
+    const qte = document.getElementById("quantiteMS").value;
+    const seuilMS = document.getElementById("seuilMS").value;
+
+    if(!lotMS || !qte) return;
+
+    stock.unshift({
+      categorie: "MS",
+      matiere: mat,
+      fournisseur: four,
+      lot: lotMS,
+      type: "",
+      date: "",
+      sacs: Number(qte),
+      seuil: Number(seuilMS) || 0
+    });
+  }
+
+  await save();
   afficher();
-
-  lot.value = "";
-  quantite.value = "";
 }
+
 
 // 🔧 Exposition des fonctions pour les onclick HTML
 window.ajouterLot = ajouterLot;
@@ -724,6 +779,22 @@ function statsFournisseurs(){
 window.addEventListener("load", () => {
   chargerDonneesFirebase();
   ecouterFirebase();
+});
+const categorie = document.getElementById("categorie");
+const blocMP = document.getElementById("bloc-mp");
+const blocMS = document.getElementById("bloc-ms");
+
+categorie.addEventListener("change", () => {
+  blocMP.style.display = "none";
+  blocMS.style.display = "none";
+
+  if (categorie.value === "mp") {
+    blocMP.style.display = "block";
+  }
+
+  if (categorie.value === "ms") {
+    blocMS.style.display = "block";
+  }
 });
 
 </script>
