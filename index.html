@@ -224,25 +224,25 @@ button:active,
 
   <div class="home-grid">
 
-  <div class="home-card ajout" onclick="openSection('ajout')">
+  <div class="home-card ajout" data-section="ajout">
     <div class="icon">➕</div>
     <div class="label">Ajout stock</div>
-  </div>
+  <button>
 
-  <div class="home-card stock" onclick="openSection('stock')">
+  <div class="home-card stock" data-section="stock">
     <div class="icon">📦</div>
     <div class="label">Stock</div>
-  </div>
+  <button>
 
-  <div class="home-card historique" onclick="openSection('historique')">
+  <div class="home-card historique" data-section="historique">
     <div class="icon">🧾</div>
     <div class="label">Historique sorties</div>
-  </div>
+  <button>
 
-  <div class="home-card stats" onclick="openSection('stats')">
+  <div class="home-card stats" data-section="stats">
     <div class="icon">📊</div>
     <div class="label">Stats</div>
-  </div>
+  <button>
 
 </div>
   </div>
@@ -512,6 +512,11 @@ function estExpire(lot){
 
   return false;
 }
+document.querySelectorAll(".home-card").forEach(card => {
+  card.addEventListener("click", () => {
+    openSection(card.dataset.section);
+  });
+});
 
 async function save() {
   const ref = doc(window.db, "neigeazur", "data");
@@ -574,7 +579,7 @@ const seuil = document.getElementById("seuilMS").value;
     categorie: "MS",
     matiere: matiere,
     fournisseur: fournisseur,
-    lot: lotMS,
+    lot: "",
     type: type,
 date: date,
 sacs: Number(qte),
@@ -867,7 +872,7 @@ fournisseurMS.addEventListener("change", () => {
  
 function resetAjoutStock() {
   // reset selects
-  document.getElementById("type-matiere").value = "";
+  document.getElementById("categorie").value = "";
   document.getElementById("matiere").value = "";
   document.getElementById("fournisseur").value = "";
 
