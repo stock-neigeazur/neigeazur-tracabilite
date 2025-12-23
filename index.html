@@ -416,17 +416,19 @@ async function save() {
 }
 
 function showTab(tab){
-  document.getElementById("tab-mp").style.display = "none";
-  document.getElementById("tab-ms").style.display = "none";
-  document.getElementById("tab-hist").style.display = "none";
-  document.getElementById("tab-stats").style.display = "none";
+  ["mp","ms","hist","stats"].forEach(t => {
+    const el = document.getElementById("tab-" + t);
+    if(el) el.style.display = "none";
+  });
 
-  document.getElementById("tab-" + tab).style.display = "block";
+  const actif = document.getElementById("tab-" + tab);
+  if(actif) actif.style.display = "block";
 
   if(tab === "stats"){
     calculerStats();
   }
 }
+
 
 
 async function ajouterLot(){
