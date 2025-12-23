@@ -63,7 +63,7 @@ button { cursor: pointer; }
   background: #16a34a; /* vert */
 }
 
-#btn-hist {
+#btn-historique {
   background: #f59e0b; /* orange */
 }
 
@@ -151,7 +151,7 @@ th, td {
   color: #ffffff !important;
 }
 
-#btn-hist.active {
+#btn-historique.active {
   background: #f59e0b !important;
   color: #ffffff !important;
 }
@@ -543,7 +543,7 @@ async function save() {
 }
 
 function showTab(tab) {
-  ["ajout", "stock", "hist", "stats"].forEach(t => {
+  ["ajout", "stock", "historique", "stats"].forEach(t => {
     const el = document.getElementById("tab-" + t);
     if (el) el.style.display = "none";
   });
@@ -780,7 +780,7 @@ function openSection(section) {
   home.style.display = "none";
   app.style.display = "block";
 
-  ["ajout", "stock", "hist", "stats"].forEach(t => {
+  ["ajout", "stock", "historique", "stats"].forEach(t => {
     const el = document.getElementById("tab-" + t);
     if (el) el.style.display = "none";
   });
