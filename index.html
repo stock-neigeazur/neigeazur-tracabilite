@@ -247,19 +247,6 @@ input#seuil {
 
 <h1>Traçabilité matières – Neige Azur</h1>
 
-<div class="tabs">
-  <button id="btn-mp" onclick="showTab('mp')">
-    Matières premières
-  </button>
-  <button id="btn-ms" onclick="showTab('ms')">
-    Matières secondaires
-  </button>
-  <button id="btn-hist" onclick="showTab('hist')">
-    Historique
-  </button>
-</div>
-
-
 <div id="tab-ajout" style="display:none;">
 
   <h3>Ajouter un lot</h3>
@@ -475,19 +462,18 @@ async function save() {
   );
 }
 
-function showTab(tab){
-  ["ajout","stock","hist","stats"].forEach(t => {
+function showTab(tab) {
+  ["ajout", "stock", "hist", "stats"].forEach(t => {
     const el = document.getElementById("tab-" + t);
-    if(el) el.style.display = "none";
+    if (el) el.style.display = "none";
   });
 
   const actif = document.getElementById("tab-" + tab);
-  if(actif) actif.style.display = "block";
+  if (actif) actif.style.display = "block";
 
-  if(tab === "stats"){
-    calculerStats();
-  }
+  if (tab === "stats") calculerStats();
 }
+
 
 
 async function ajouterLot(){
