@@ -766,24 +766,34 @@ matiere.addEventListener("change", () => {
 });
 
 function openSection(section) {
+  console.log("OPEN SECTION:", section);
 
-  document.getElementById("home").style.display = "none";
-  document.getElementById("app").style.display = "block";
+  const home = document.getElementById("home");
+  const app = document.getElementById("app");
 
-  ["ajout","stock","hist","stats"].forEach(t => {
-    const el = document.getElementById("tab-" + t);
-    if(el) el.style.display = "none";
-  });
-
-  if(section === "ajout") {
-    resetAjoutStock();   // ⬅️ ICI
-    showTab("ajout");
+  if (!home || !app) {
+    console.error("home ou app introuvable");
+    return;
   }
 
-  if(section === "stock") showTab("stock");
-  if(section === "historique") showTab("hist");
-  if(section === "stats") showTab("stats");
+  home.style.display = "none";
+  app.style.display = "block";
+
+  ["ajout", "stock", "hist", "stats"].forEach(t => {
+    const el = document.getElementById("tab-" + t);
+    if (el) el.style.display = "none";
+  });
+
+  const target = document.getElementById("tab-" + section);
+  if (target) {
+    target.style.display = "block";
+  } else {
+    console.error("Onglet introuvable :", section);
+  }
 }
+
+window.openSection = openSection;
+
 
 
 
@@ -901,10 +911,13 @@ window.validerSortie = validerSortie;
 window.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".home-card").forEach(card => {
     card.addEventListener("click", () => {
-      openSection(card.dataset.section);
+      const section = card.dataset.section;
+      console.log("CLICK:", section); // debug
+      window.openSection(section);
     });
   });
 });
+
 
 
 </script>
