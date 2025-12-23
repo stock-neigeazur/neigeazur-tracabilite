@@ -303,26 +303,46 @@ input#seuil {
 
  <div id="bloc-ms" style="display:none;">
 
-  <select id="matiereMS">
-    <option value="Bac plastique">Bac plastique</option>
-    <option value="Carton">Carton</option>
-    <option value="Film alimentaire">Film alimentaire</option>
-    <option value="Couvercle">Couvercle</option>
-    <option value="Étiquette">Étiquette</option>
+  <!-- Fournisseur -->
+  <select id="fournisseurMS">
+    <option value="">— Choisir un fournisseur —</option>
+    <option value="transgourmet">Transgourmet</option>
+    <option value="metro">Metro</option>
+    <option value="promocash">Promocash</option>
   </select>
 
-  <select id="fournisseurMS">
-    <option value="Transgourmet">Transgourmet</option>
-    <option value="Metro">Metro</option>
-    <option value="Promocash">Promocash</option>
-    <option value="Autre">Autre</option>
-  </select>
+  <!-- PRODUITS TRANSGOURMET -->
+  <div id="produits-transgourmet" style="display:none;">
+    <select id="matiereMS-transgourmet">
+      <option value="Bac plastique">Bac plastique</option>
+      <option value="Couvercle">Couvercle</option>
+      <option value="Film alimentaire">Film alimentaire</option>
+    </select>
+  </div>
+
+  <!-- PRODUITS METRO -->
+  <div id="produits-metro" style="display:none;">
+    <select id="matiereMS-metro">
+      <option value="Carton">Carton</option>
+      <option value="Barquette">Barquette</option>
+      <option value="Sachet">Sachet</option>
+    </select>
+  </div>
+
+  <!-- PRODUITS PROMOCASH -->
+  <div id="produits-promocash" style="display:none;">
+    <select id="matiereMS-promocash">
+      <option value="Étiquette">Étiquette</option>
+      <option value="Film étirable">Film étirable</option>
+    </select>
+  </div>
 
   <input id="lotMS" placeholder="Numéro de lot">
   <input id="quantiteMS" type="number" placeholder="Quantité">
   <input id="seuilMS" type="number" placeholder="Seuil d’alerte">
 
 </div>
+
 
   <button onclick="ajouterLot().catch(console.error)">Ajouter</button>
 </div>
@@ -508,41 +528,40 @@ function showTab(tab) {
 
 async function ajouterLot(){
 
-  if(categorie.value === "mp"){
-    if(!lot.value || !quantite.value) return;
+ if (categorie.value === "ms") {
 
-    stock.unshift({
-      categorie: "MP",
-      matiere: matiere.value === "Autre" ? matiereAutre.value : matiere.value,
-      fournisseur: fournisseur.value === "Autre" ? fournisseurAutre.value : fournisseur.value,
-      lot: lot.value,
-      type: type.value,
-      date: dlc.value || "",
-      sacs: Number(quantite.value),
-      seuil: Number(seuil.value) || 0
-    });
+  const fournisseur = fournisseurMS.value;
+  let matiere = "";
+
+  if (fournisseur === "transgourmet") {
+    matiere = document.getElementById("matiereMS-transgourmet").value;
   }
 
-  if(categorie.value === "ms"){
-    const mat = document.getElementById("matiereMS").value;
-    const four = document.getElementById("fournisseurMS").value;
-    const lotMS = document.getElementById("lotMS").value;
-    const qte = document.getElementById("quantiteMS").value;
-    const seuilMS = document.getElementById("seuilMS").value;
-
-    if(!lotMS || !qte) return;
-
-    stock.unshift({
-      categorie: "MS",
-      matiere: mat,
-      fournisseur: four,
-      lot: lotMS,
-      type: "",
-      date: "",
-      sacs: Number(qte),
-      seuil: Number(seuilMS) || 0
-    });
+  if (fournisseur === "metro") {
+    matiere = document.getElementById("matiereMS-metro").value;
   }
+
+  if (fournisseur === "promocash") {
+    matiere = document.getElementById("matiereMS-promocash").value;
+  }
+
+  const lotMS = document.getElementById("lotMS").value;
+  const qte = document.getElementById("quantiteMS").value;
+  const seuilMS = document.getElementById("seuilMS").value;
+
+  if (!fournisseur || !matiere || !qte) return;
+
+  stock.unshift({
+    categorie: "MS",
+    matiere: matiere,
+    fournisseur: fournisseur,
+    lot: lotMS,
+    type: "",
+    date: "",
+    sacs: Number(qte),
+    seuil: Number(seuilMS) || 0
+  });
+}
 
   await save();
   afficher();
@@ -794,6 +813,23 @@ categorie.addEventListener("change", () => {
 
   if (categorie.value === "ms") {
     blocMS.style.display = "block";
+  }
+});
+const fournisseurMS = document.getElementById("fournisseurMS");
+
+const blocsProduitsMS = {
+  transgourmet: document.getElementById("produits-transgourmet"),
+  metro: document.getElementById("produits-metro"),
+  promocash: document.getElementById("produits-promocash")
+};
+
+fournisseurMS.addEventListener("change", () => {
+  // cacher tous les blocs produits
+  Object.values(blocsProduitsMS).forEach(b => b.style.display = "none");
+
+  // afficher uniquement celui du fournisseur choisi
+  if (blocsProduitsMS[fournisseurMS.value]) {
+    blocsProduitsMS[fournisseurMS.value].style.display = "block";
   }
 });
 
