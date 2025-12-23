@@ -666,10 +666,16 @@ async function validerSortie(i){
     lot: stock[i].lot,
     quantite: q
   });
-
+historiqueMois.push({
+  date: new Date().toLocaleDateString(),
+  matiere: stock[i].matiere,
+  lot: stock[i].lot,
+  quantite: q
+});
   await save();   // ⬅️ POINT CLÉ
   afficher();
 }
+
 
 function calculerStats(){
 
@@ -780,23 +786,27 @@ function openSection(section) {
   home.style.display = "none";
   app.style.display = "block";
 
+  // cacher tous les onglets
   ["ajout", "stock", "historique", "stats"].forEach(t => {
     const el = document.getElementById("tab-" + t);
     if (el) el.style.display = "none";
   });
 
+  // afficher l’onglet demandé
   const target = document.getElementById("tab-" + section);
-  if (target) {
-    target.style.display = "block";
-  } else {
+  if (!target) {
     console.error("Onglet introuvable :", section);
+    return;
+  }
+
+  target.style.display = "block";
+
+  if (section === "historique") {
+    afficherHistorique();
   }
 }
 
 window.openSection = openSection;
-
-
-
 
 function retourAccueil() {
   document.getElementById("app").style.display = "none";
@@ -904,7 +914,24 @@ function resetAjoutStock() {
   document.getElementById("bloc-mp").style.display = "none";
   document.getElementById("bloc-ms").style.display = "none";
 }
- 
+ function afficherHistorique() {
+  const tbody = document.getElementById("tableHistorique");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  historiqueMois.forEach(h => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${h.date}</td>
+        <td>${h.matiere}</td>
+        <td>${h.lot}</td>
+        <td>${h.quantite}</td>
+      </tr>
+    `;
+  });
+}
+
 window.openSection = openSection;
 window.retourAccueil = retourAccueil;
 window.ajouterLot = ajouterLot;
