@@ -211,6 +211,18 @@ button:active,
   opacity: 0.85;
 }
 
+ @media (max-width: 768px) {
+
+  .home-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-card {
+    min-height: 140px;
+  }
+
+}
+
 </style>
 </head>
 
@@ -512,11 +524,6 @@ function estExpire(lot){
 
   return false;
 }
-document.querySelectorAll(".home-card").forEach(card => {
-  card.addEventListener("click", () => {
-    openSection(card.dataset.section);
-  });
-});
 
 async function save() {
   const ref = doc(window.db, "neigeazur", "data");
@@ -891,6 +898,13 @@ window.openSection = openSection;
 window.retourAccueil = retourAccueil;
 window.ajouterLot = ajouterLot;
 window.validerSortie = validerSortie;
+window.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".home-card").forEach(card => {
+    card.addEventListener("click", () => {
+      openSection(card.dataset.section);
+    });
+  });
+});
 
 
 </script>
