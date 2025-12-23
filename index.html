@@ -189,6 +189,20 @@ th, td {
 #stats-matieres li {
   margin: 4px 0;
 }
+/* Seuil d’alerte */
+input#seuil {
+  border: 2px dashed #f59e0b;
+}
+
+/* Ligne stock bas */
+.stock-bas {
+  background-color: #fde68a !important;
+}
+
+/* Ligne critique */
+.stock-critique {
+  background-color: #fca5a5 !important;
+}
 
 </style>
 </head>
@@ -288,6 +302,7 @@ th, td {
 
 <input id="dlc" type="date">
 <input id="quantite" type="number" placeholder="Quantité (sacs)">
+<input id="seuil" type="number" placeholder="Seuil d’alerte (sacs)">
 
 <button onclick="ajouterLot().catch(console.error)">Ajouter</button>
 
@@ -398,6 +413,7 @@ const quantite = document.getElementById("quantite");
 
 const tableStock = document.getElementById("tableStock");
 const sortiesMoisListe = document.getElementById("sortiesMoisListe");
+const seuil = document.getElementById("seuil");
 
 async function save() {
   const ref = doc(window.db, "neigeazur", "data");
@@ -434,14 +450,16 @@ function showTab(tab){
 async function ajouterLot(){
   if(!lot.value || !quantite.value) return;
 
-  stock.unshift({
-    matiere: matiere.value === "Autre" ? matiereAutre.value : matiere.value,
-    fournisseur: fournisseur.value === "Autre" ? fournisseurAutre.value : fournisseur.value,
-    lot: lot.value,
-    type: type.value,
-    date: dlc.value || "",
-    sacs: Number(quantite.value)
-  });
+ stock.unshift({
+  matiere: matiere.value === "Autre" ? matiereAutre.value : matiere.value,
+  fournisseur: fournisseur.value === "Autre" ? fournisseurAutre.value : fournisseur.value,
+  lot: lot.value,
+  type: type.value,
+  date: dlc.value || "",
+  sacs: Number(quantite.value),
+  seuil: Number(seuil.value) || 0   // ⬅️ AJOUT
+});
+
 
   save().catch(console.error);
   afficher();
@@ -456,23 +474,22 @@ window.validerSortie = validerSortie;
 window.showTab = showTab;
  
 function afficher(){
-  tableStock.innerHTML = "";
+  const alerte = x.seuil > 0 && x.sacs <= x.seuil;
 
-  stock.forEach((x,i)=>{
-    tableStock.innerHTML += `
-      <tr>
-        <td>${x.matiere}</td>
-        <td>${x.fournisseur}</td>
-        <td>${x.lot}</td>
-        <td>${x.date}</td>
-        <td>${x.sacs}</td>
-        <td>
-          <input type="number" id="sortie-${i}" style="width:60px">
-          <button onclick="validerSortie(${i})">Valider</button>
-        </td>
-      </tr>
-    `;
-  });
+tableStock.innerHTML += `
+<tr class="${alerte ? 'expired' : ''}">
+  <td>${x.matiere}</td>
+  <td>${x.fournisseur}</td>
+  <td>${x.lot}</td>
+  <td>${x.date}</td>
+  <td>${x.sacs}</td>
+  <td>
+    <input type="number" id="sortie-${i}" style="width:60px">
+    <button onclick="validerSortie(${i})">Valider</button>
+  </td>
+</tr>
+`;
+
 
   afficherSortiesMois();
 }
