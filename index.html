@@ -204,6 +204,13 @@ input#seuil {
   background-color: #fca5a5 !important;
 }
 
+ /* FEEDBACK TACTILE MOBILE */
+button:active,
+.home-card:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
 </style>
 </head>
 
@@ -874,6 +881,11 @@ function resetAjoutStock() {
   document.getElementById("bloc-mp").style.display = "none";
   document.getElementById("bloc-ms").style.display = "none";
 }
+ 
+window.openSection = openSection;
+window.retourAccueil = retourAccueil;
+window.ajouterLot = ajouterLot;
+window.validerSortie = validerSortie;
 
 
 </script>
