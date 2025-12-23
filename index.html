@@ -494,7 +494,14 @@ function afficher(){
 
   tableStock.innerHTML = "";
 
-      <tr>
+  stock.forEach((x, i) => {
+
+    let classe = "";
+    if (x.seuil && x.sacs <= x.seuil) classe = "stock-bas";
+    if (x.seuil && x.sacs <= x.seuil / 2) classe = "stock-critique";
+
+    tableStock.innerHTML += `
+      <tr class="${classe}">
         <td>${x.matiere}</td>
         <td>${x.fournisseur}</td>
         <td>${x.lot}</td>
@@ -507,7 +514,10 @@ function afficher(){
       </tr>
     `;
   });
+
+  afficherSortiesMois();
 }
+
 
 
 
@@ -520,6 +530,7 @@ function afficherSortiesMois(){
     sortiesMoisListe.innerHTML += `<li>${s.date} – ${s.quantite} sacs ${s.matiere}</li>`;
   });
 }
+
 
 
 async function validerSortie(i){
@@ -537,12 +548,7 @@ async function validerSortie(i){
   await save();   // ⬅️ POINT CLÉ
   afficher();
 }
-function afficherSortiesMois(){
-  sortiesMoisListe.innerHTML = "";
-  sortiesMois.forEach(s=>{
-    sortiesMoisListe.innerHTML += `<li>${s.date} – ${s.quantite} sacs ${s.matiere}</li>`;
-  });
-}
+
 function calculerStats(){
 
   const totalEl = document.getElementById("stat-total-sorties");
@@ -551,16 +557,17 @@ function calculerStats(){
 
   if (!totalEl || !nbEl || !ul) return;
 
-  
+  let total = 0;
+  let compteur = {};
+
   sortiesMois.forEach(s => {
     total += s.quantite;
     compteur[s.matiere] = (compteur[s.matiere] || 0) + s.quantite;
   });
 
-  document.getElementById("stat-total-sorties").textContent = total;
-  document.getElementById("stat-nb-sorties").textContent = sortiesMois.length;
+  totalEl.textContent = total;
+  nbEl.textContent = sortiesMois.length;
 
-  const ul = document.getElementById("stats-matieres");
   ul.innerHTML = "";
 
   Object.entries(compteur)
@@ -569,6 +576,7 @@ function calculerStats(){
       ul.innerHTML += `<li>${matiere} : ${qte} sacs</li>`;
     });
 }
+
 
 async function chargerDonneesFirebase() {
   const ref = doc(window.db, "neigeazur", "data");
