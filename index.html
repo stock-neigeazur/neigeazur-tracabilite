@@ -489,10 +489,11 @@ window.validerSortie = validerSortie;
 window.showTab = showTab;
  
 function afficher(){
+
+  if (!tableStock) return;
+
   tableStock.innerHTML = "";
 
-  stock.forEach((x,i)=>{
-    tableStock.innerHTML += `
       <tr>
         <td>${x.matiere}</td>
         <td>${x.fournisseur}</td>
@@ -510,8 +511,16 @@ function afficher(){
 
 
 
-  afficherSortiesMois();
+function afficherSortiesMois(){
+
+  if (!sortiesMoisListe) return;
+
+  sortiesMoisListe.innerHTML = "";
+  sortiesMois.forEach(s=>{
+    sortiesMoisListe.innerHTML += `<li>${s.date} – ${s.quantite} sacs ${s.matiere}</li>`;
+  });
 }
+
 
 async function validerSortie(i){
   const q = Number(document.getElementById("sortie-"+i).value);
@@ -535,8 +544,13 @@ function afficherSortiesMois(){
   });
 }
 function calculerStats(){
-  let total = 0;
-  let compteur = {};
+
+  const totalEl = document.getElementById("stat-total-sorties");
+  const nbEl = document.getElementById("stat-nb-sorties");
+  const ul = document.getElementById("stats-matieres");
+
+  if (!totalEl || !nbEl || !ul) return;
+
   
   sortiesMois.forEach(s => {
     total += s.quantite;
