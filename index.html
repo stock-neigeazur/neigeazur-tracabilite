@@ -686,7 +686,7 @@ async function validerSortie(i){
 sortiesMois.push({
   date: new Date().toLocaleDateString(),
   matiere: stock[i].matiere,
-  lot: stock[i].lot,
+  lot: stock[i].lot || "SANS LOT",
   dlc: stock[i].date,
   type: stock[i].type,
   quantite: q
@@ -994,6 +994,15 @@ async function validerEditSortie(index) {
   const nouvelleQte = Number(
     document.getElementById("edit-qte-" + index).value
   );
+const hist = historiqueMois.find(h =>
+  h.date === sortie.date &&
+  h.matiere === sortie.matiere &&
+  h.lot === sortie.lot
+);
+
+if (hist) {
+  hist.quantite = nouvelleQte;
+}
 
   if (!nouvelleQte || nouvelleQte <= 0) return;
 
@@ -1031,6 +1040,10 @@ async function validerEditSortie(index) {
   await save();
   afficher();
   afficherSortiesMois();
+}
+const nouvelleDateISO = document.getElementById("edit-date-" + index).value;
+if (nouvelleDateISO) {
+  sortie.date = new Date(nouvelleDateISO).toLocaleDateString("fr-FR");
 }
 
 window.validerEditSortie = validerEditSortie;
