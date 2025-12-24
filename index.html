@@ -1105,16 +1105,38 @@ window.supprimerSortie = supprimerSortie;
 }
 
  function supprimerStock(index) {
-  const l = stock[index];
-  if (!l) return;
+  const lot = stock[index];
+  if (!lot) return;
 
-  if (!confirm(`Supprimer le lot ${l.matiere} (${l.lot || "sans lot"}) ?`)) return;
+  const message = `
+Supprimer le lot :
+${lot.matiere}
+Lot : ${lot.lot || "SANS LOT"}
 
+⚠️ Toutes les sorties associées seront aussi supprimées.
+  `;
+
+  if (!confirm(message)) return;
+
+  // 🔥 SUPPRESSION DES SORTIES DU MOIS
+  sortiesMois = sortiesMois.filter(s =>
+    !(s.matiere === lot.matiere && s.lot === lot.lot)
+  );
+
+  // 🔥 SUPPRESSION DE L’HISTORIQUE
+  historiqueMois = historiqueMois.filter(h =>
+    !(h.matiere === lot.matiere && h.lot === lot.lot)
+  );
+
+  // 🔥 SUPPRESSION DU LOT DU STOCK
   stock.splice(index, 1);
 
   save();
   afficher();
+  afficherSortiesMois();
+  afficherHistorique();
 }
+
 window.editerStock = editerStock;
 window.supprimerStock = supprimerStock;
 
