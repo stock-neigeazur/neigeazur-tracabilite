@@ -822,6 +822,7 @@ async function chargerDonneesFirebase() {
       updatedAt: new Date()
     });
   }
+nettoyerHistoriqueOrphelin();
 
   afficher();
   afficherSortiesMois();
@@ -1185,6 +1186,14 @@ Lot : ${lot.lot || "SANS LOT"}
 
 window.editerStock = editerStock;
 window.supprimerStock = supprimerStock;
+
+ function nettoyerHistoriqueOrphelin() {
+  const idsValides = sortiesMois.map(s => s.id);
+
+  historiqueMois = historiqueMois.filter(h =>
+    h.id && idsValides.includes(h.id)
+  );
+}
 
 
 </script>
