@@ -714,7 +714,8 @@ function afficherSortiesMois() {
             ${s.type || ""} : ${s.dlc || "—"}
           </span>
           <button onclick="editerSortie(${s._index})">✏️</button>
-          <button onclick="supprimerSortie(${s._index})">🗑️</button>
+          <button onclick="supprimerSortie(${s.id})">🗑️</button>
+
         </li>
       `;
     });
@@ -726,34 +727,27 @@ async function validerSortie(i) {
   const q = Number(document.getElementById("sortie-" + i).value);
   if (!q || q > stock[i].sacs) return;
 
-  // 🔑 ID UNIQUE PARTAGÉ
-  const id = Date.now();
+  const id = Date.now(); // ✅ ID UNIQUE PARTAGÉ
 
   stock[i].sacs -= q;
 
-  sortiesMois.push({
-    id, // ⬅️ ID
-    date: new Date().toLocaleDateString(),
+  const sortie = {
+    id: id,
+    date: new Date().toLocaleDateString("fr-FR"),
     matiere: stock[i].matiere,
     lot: stock[i].lot || "SANS LOT",
     dlc: stock[i].date,
     type: stock[i].type,
     quantite: q
-  });
+  };
 
-  historiqueMois.push({
-    id, // ⬅️ ID OBLIGATOIRE ICI
-    date: new Date().toLocaleDateString(),
-    matiere: stock[i].matiere,
-    lot: stock[i].lot || "SANS LOT",
-    dlc: stock[i].date,
-    type: stock[i].type,
-    quantite: q
-  });
+  sortiesMois.push(sortie);
+  historiqueMois.push({ ...sortie }); // ✅ MÊME ID
 
   await save();
   afficher();
 }
+
 
 
 
@@ -1099,36 +1093,31 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-async function supprimerSortie(index) {
-  const sortie = sortiesMois[index];
+async function supprimerSortie(id) {
+  const sortie = sortiesMois.find(s => s.id === id);
   if (!sortie) return;
 
   if (!confirm("Supprimer cette sortie et réattribuer le stock ?")) return;
 
-  // 🔁 retrouver le lot dans le stock
+  // 🔁 Réattribuer le stock
   const lotStock = stock.find(l =>
     l.matiere === sortie.matiere &&
     l.lot === sortie.lot
   );
 
-  if (!lotStock) {
-    alert("Lot d'origine introuvable dans le stock");
-    return;
+  if (lotStock) {
+    lotStock.sacs += sortie.quantite;
   }
 
-  // ➕ réattribuer la quantité au stock
-  lotStock.sacs += sortie.quantite;
+  // ❌ Supprimer sortie
+  sortiesMois = sortiesMois.filter(s => s.id !== id);
 
-  // ❌ supprimer la sortie du mois (par ID)
-  sortiesMois = sortiesMois.filter(s => s.id !== sortie.id);
-
-  // ❌ supprimer AUSSI de l’historique (par ID)
-  historiqueMois = historiqueMois.filter(h => h.id !== sortie.id);
+  // ❌ Supprimer historique correspondant
+  historiqueMois = historiqueMois.filter(h => h.id !== id);
 
   await save();
   afficher();
   afficherSortiesMois();
-  afficherHistorique();
 }
 
 window.supprimerSortie = supprimerSortie;
@@ -1194,6 +1183,11 @@ window.supprimerStock = supprimerStock;
     h.id && idsValides.includes(h.id)
   );
 }
+function nettoyerHistoriqueFantome() {
+  const ids = sortiesMois.map(s => s.id);
+  historiqueMois = historiqueMois.filter(h => ids.includes(h.id));
+}
+nettoyerHistoriqueFantome();
 
 
 </script>
