@@ -523,6 +523,30 @@ const seuils = {
   "Purée de fruits": 5
 };
 
+// 🔔 Seuils automatiques par matière
+const seuilsParMatiere = {
+  "Lait entier": 4,
+  "Lait 0%": 4,
+  "Crème 35%": 3,
+
+  "Jaune d'oeuf": 2,
+  "Blanc d'oeuf": 2,
+  "Oeuf entier": 2,
+
+  "Sucre": 5,
+  "Sucre inverti": 3,
+  "Dextrose": 3,
+  "Glucose": 3,
+
+  "Stabilisateur glace": 1,
+  "Stabilisateur sorbet": 1,
+
+  "Huile de coco": 2,
+  "Purée de fruits": 5
+};
+
+
+
 // 🔧 Références DOM (OBLIGATOIRE avec type="module")
 const matiere = document.getElementById("matiere");
 const matiereAutre = document.getElementById("matiereAutre");
@@ -1001,6 +1025,15 @@ const blocsProduitsMP = {
   Aigremont: document.getElementById("produits-Aigremont"),
   Rogelfruits: document.getElementById("produits-Rogelfruits")
 };
+// 🔄 Appliquer automatiquement le seuil quand on choisit un produit MP
+Object.values(blocsProduitsMP).forEach(bloc => {
+  const select = bloc.querySelector("select");
+  if (!select) return;
+
+  select.addEventListener("change", () => {
+    appliquerSeuil(select.value);
+  });
+});
 
 
 fournisseurMP.addEventListener("change", () => {
@@ -1251,6 +1284,12 @@ function nettoyerHistoriqueOrphelin() {
   );
 }
 
+function appliquerSeuil(matiere) {
+  const inputSeuil = document.getElementById("seuil");
+  if (!inputSeuil) return;
+
+  inputSeuil.value = seuilsParMatiere[matiere] ?? "";
+}
 
 
 </script>
