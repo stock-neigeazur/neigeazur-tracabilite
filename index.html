@@ -966,9 +966,19 @@ const blocMP = document.getElementById("bloc-mp");
 const blocMS = document.getElementById("bloc-ms");
 
 categorie.addEventListener("change", () => {
+  // cacher tout
   blocMP.style.display = "none";
   blocMS.style.display = "none";
 
+  // 🔥 cacher produits MP
+  Object.values(blocsProduitsMP).forEach(b => b.style.display = "none");
+  champsMP.style.display = "none";
+
+  // 🔥 cacher produits MS
+  Object.values(blocsProduitsMS).forEach(b => b.style.display = "none");
+  champsMS.style.display = "none";
+
+  // afficher uniquement le bon bloc
   if (categorie.value === "mp") {
     blocMP.style.display = "block";
   }
@@ -977,6 +987,8 @@ categorie.addEventListener("change", () => {
     blocMS.style.display = "block";
   }
 });
+
+
 
  const fournisseurMP = document.getElementById("fournisseurMP");
 const champsMP = document.getElementById("champs-mp");
