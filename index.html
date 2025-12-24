@@ -751,48 +751,44 @@ window.validerSortie = validerSortie;
 window.showTab = showTab;
  
 function afficher() {
-
   if (!tableStock) return;
 
   tableStock.innerHTML = "";
 
-  // 🔢 Total par matière
-const totalParMatiere = {};
-stock.forEach(lot => {
-  totalParMatiere[lot.matiere] =
-    (totalParMatiere[lot.matiere] || 0) + lot.sacs;
-});
+  const totalParMatiere = stockParMatiere();
 
-stock.forEach((x, i) => {
-  let classe = "";
+  stock.forEach((x, i) => {
+    let classe = "stock-ok";
 
-  const total = totalParMatiere[x.matiere];
-  const seuil = x.seuil;
+    const seuil = seuilsParMatiere[x.matiere];
+    const total = totalParMatiere[x.matiere] || 0;
 
-  if (estExpire(x)) {
-    classe = "expired";
-  } 
-  else if (seuil !== undefined && total <= seuil) {
-    classe = "stock-critique";
-  }
+    if (estExpire(x)) {
+      classe = "expired";
+    }
+    else if (seuil !== undefined && total <= seuil) {
+      classe = "stock-critique"; // 🔴
+    }
+    else if (seuil !== undefined && total <= seuil * 2) {
+      classe = "stock-warning"; // 🟠
+    }
 
-  tableStock.innerHTML += `
-    <tr class="${classe}">
-      <td>${x.matiere}</td>
-      <td>${x.fournisseur}</td>
-      <td>${x.lot}</td>
-      <td>${x.date || ""}</td>
-      <td>${x.sacs}</td>
-      <td>
-        <input type="number" id="sortie-${i}" style="width:50px">
-        <button onclick="validerSortie(${i})">✔️</button>
-        <button onclick="editerStock(${i})">✏️</button>
-        <button onclick="supprimerStock(${i})">🗑️</button>
-      </td>
-    </tr>
-  `;
-});
-
+    tableStock.innerHTML += `
+      <tr class="${classe}">
+        <td>${x.matiere}</td>
+        <td>${x.fournisseur}</td>
+        <td>${x.lot}</td>
+        <td>${x.date}</td>
+        <td>${x.sacs}</td>
+        <td>
+          <input type="number" id="sortie-${i}" style="width:50px">
+          <button onclick="validerSortie(${i})">✔️</button>
+          <button onclick="editerStock(${i})">✏️</button>
+          <button onclick="supprimerStock(${i})">🗑️</button>
+        </td>
+      </tr>
+    `;
+  });
 
   afficherSortiesMois();
 }
