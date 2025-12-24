@@ -280,51 +280,60 @@ button:active,
   <option value="ms">Matière secondaire</option>
 </select>
 
- <div id="bloc-mp" style="display:none;">
-  
-  <select id="matiere">
-    <option value="">— Produit —</option>
-    <option value="Sucre">Sucre</option>
-    <option value="Sucre inverti">Sucre inverti</option>
-    <option value="Dextrose">Dextrose</option>
-    <option value="Glucose">Glucose</option>
-    <option value="Lait entier">Lait entier</option>
-    <option value="Lait 0%">Lait 0%</option>
-    <option value="Crème 35%">Crème 35%</option>
-    <option value="Jaune d'œuf">Jaune d'œuf</option>
-    <option value="Blanc d'œuf">Blanc d'œuf</option>
-    <option value="Oeuf Entier">Oeuf Entier</option>
-    <option value="Huile de coco">Huile de coco</option>
-    <option value="Stabilisateur glace">Stabilisateur glace</option>
-    <option value="Stabilisateur sorbet">Stabilisateur sorbet</option>
-    <option value="Purée de fruits">Purée de fruits</option>
-    <option value="Autre">Autre (à préciser)</option>
-  </select>
+<div id="bloc-mp" style="display:none;">
 
-  <input id="matiereAutre" placeholder="Préciser la matière" style="display:none">
-
-  <select id="fournisseur">
+  <!-- Fournisseur MP -->
+  <select id="fournisseurMP">
     <option value="">— Choisir un fournisseur —</option>
     <option value="Montaigu">Montaigu</option>
     <option value="Giraudon">Giraudon</option>
     <option value="Fedpa">Fedpa</option>
     <option value="Socovo">Socovo</option>
     <option value="Rogelfruits">Rogelfruits</option>
-    <option value="Autre">Autre (à préciser)</option>
   </select>
 
-  <input id="fournisseurAutre" placeholder="Préciser le fournisseur" style="display:none">
-  <input id="lot" placeholder="Numéro de lot">
+  <!-- PRODUITS PAR FOURNISSEUR -->
+  <div id="produits-Montaigu" style="display:none;">
+    <select id="matiere-Montaigu">
+      <option value="Sucre">Sucre</option>
+      <option value="Sucre inverti">Sucre inverti</option>
+      <option value="Dextrose">Dextrose</option>
+    </select>
+  </div>
 
-  <select id="type">
-    <option value="DLUO">DLUO</option>
-    <option value="DLC">DLC</option>
-  </select>
+  <div id="produits-Giraudon" style="display:none;">
+    <select id="matiere-Giraudon">
+      <option value="Lait entier">Lait entier</option>
+      <option value="Lait 0%">Lait 0%</option>
+      <option value="Crème 35%">Crème 35%</option>
+    </select>
+  </div>
 
-  <input id="dlc" type="date">
-  <input id="quantite" type="number" placeholder="Quantité (sacs)">
-  <input id="seuil" type="number" placeholder="Seuil d’alerte (sacs)">
-  
+  <div id="produits-Fedpa" style="display:none;">
+    <select id="matiere-Fedpa">
+      <option value="Stabilisateur glace">Stabilisateur glace</option>
+      <option value="Stabilisateur sorbet">Stabilisateur sorbet</option>
+    </select>
+  </div>
+
+  <div id="produits-Rogelfruits" style="display:none;">
+    <select id="matiere-Rogelfruits">
+      <option value="Purée de fruits">Purée de fruits</option>
+    </select>
+  </div>
+
+  <!-- CHAMPS COMMUNS MP -->
+  <div id="champs-mp" style="display:none;">
+    <input id="lot" placeholder="Numéro de lot">
+    <select id="type">
+      <option value="DLUO">DLUO</option>
+      <option value="DLC">DLC</option>
+    </select>
+    <input id="dlc" type="date">
+    <input id="quantite" type="number" placeholder="Quantité (sacs)">
+    <input id="seuil" type="number" placeholder="Seuil d’alerte">
+  </div>
+
 </div>
 
  <div id="bloc-ms" style="display:none;">
@@ -564,25 +573,30 @@ function showTab(tab) {
 
 async function ajouterLot(){
 
- if (categorie.value === "mp") {
+if (categorie.value === "mp") {
 
-  let nomMatiere = matiere.value === "Autre"
-    ? matiereAutre.value
-    : matiere.value;
+  const fournisseur = fournisseurMP.value;
+  if (!fournisseur) {
+    alert("Choisir un fournisseur");
+    return;
+  }
 
-  let nomFournisseur = fournisseur.value === "Autre"
-    ? fournisseurAutre.value
-    : fournisseur.value;
+  const selectProduit = document.querySelector(
+    `#produits-${fournisseur} select`
+  );
 
-  if (!nomMatiere || !nomFournisseur || !quantite.value) {
+  if (!selectProduit) return;
+
+  const matiere = selectProduit.value;
+  if (!matiere || !quantite.value) {
     alert("Champs incomplets");
     return;
   }
 
   stock.unshift({
     categorie: "MP",
-    matiere: nomMatiere,
-    fournisseur: nomFournisseur,
+    matiere: matiere,
+    fournisseur: fournisseur,
     lot: lot.value || "SANS LOT",
     type: type.value,
     date: dlc.value,
@@ -590,6 +604,7 @@ async function ajouterLot(){
     seuil: Number(seuil.value) || 0
   });
 }
+
 if (categorie.value === "ms") {
 
   const fournisseur = fournisseurMS.value;
@@ -952,6 +967,29 @@ categorie.addEventListener("change", () => {
 
   if (categorie.value === "ms") {
     blocMS.style.display = "block";
+  }
+});
+
+ const fournisseurMP = document.getElementById("fournisseurMP");
+const champsMP = document.getElementById("champs-mp");
+
+const blocsProduitsMP = {
+  Montaigu: document.getElementById("produits-Montaigu"),
+  Giraudon: document.getElementById("produits-Giraudon"),
+  Fedpa: document.getElementById("produits-Fedpa"),
+  Rogelfruits: document.getElementById("produits-Rogelfruits")
+};
+
+fournisseurMP.addEventListener("change", () => {
+
+  // cacher tous les produits
+  Object.values(blocsProduitsMP).forEach(b => b.style.display = "none");
+  champsMP.style.display = "none";
+
+  // afficher produits + champs
+  if (blocsProduitsMP[fournisseurMP.value]) {
+    blocsProduitsMP[fournisseurMP.value].style.display = "block";
+    champsMP.style.display = "block";
   }
 });
 
