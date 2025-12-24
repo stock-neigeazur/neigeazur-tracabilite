@@ -632,9 +632,11 @@ function afficher(){
       <td>${x.date}</td>
       <td>${x.sacs}</td>
       <td>
-        <input type="number" id="sortie-${i}" style="width:60px">
-        <button onclick="validerSortie(${i})">Valider</button>
-      </td>
+  <input type="number" id="sortie-${i}" style="width:50px">
+  <button onclick="validerSortie(${i})">✔️</button>
+  <button onclick="editerStock(${i})" title="Modifier">✏️</button>
+  <button onclick="supprimerStock(${i})" title="Supprimer">🗑️</button>
+</td>
     </tr>
   `;
 });
@@ -1084,6 +1086,37 @@ async function supprimerSortie(index) {
   afficherSortiesMois();
 }
 window.supprimerSortie = supprimerSortie;
+
+ function editerStock(index) {
+  const l = stock[index];
+  if (!l) return;
+
+  const qte = prompt("Quantité en stock (sacs) :", l.sacs);
+  if (qte === null) return;
+
+  const seuil = prompt("Seuil d’alerte :", l.seuil || 0);
+  if (seuil === null) return;
+
+  l.sacs = Number(qte);
+  l.seuil = Number(seuil);
+
+  save();
+  afficher();
+}
+
+ function supprimerStock(index) {
+  const l = stock[index];
+  if (!l) return;
+
+  if (!confirm(`Supprimer le lot ${l.matiere} (${l.lot || "sans lot"}) ?`)) return;
+
+  stock.splice(index, 1);
+
+  save();
+  afficher();
+}
+window.editerStock = editerStock;
+window.supprimerStock = supprimerStock;
 
 
 </script>
