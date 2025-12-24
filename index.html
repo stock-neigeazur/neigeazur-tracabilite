@@ -756,43 +756,43 @@ function afficher() {
 
   tableStock.innerHTML = "";
 
-  // 🔢 Calcul du total par matière
-  const totalParMatiere = {};
-  stock.forEach(lot => {
-    totalParMatiere[lot.matiere] =
-      (totalParMatiere[lot.matiere] || 0) + lot.sacs;
-  });
+  // 🔢 Total par matière
+const totalParMatiere = {};
+stock.forEach(lot => {
+  totalParMatiere[lot.matiere] =
+    (totalParMatiere[lot.matiere] || 0) + lot.sacs;
+});
 
-  // 📦 Affichage du stock
-  stock.forEach((x, i) => {
-    let classe = "";
+stock.forEach((x, i) => {
+  let classe = "";
 
-    const total = totalParMatiere[x.matiere];
-    const seuil = x.seuil;
+  const total = totalParMatiere[x.matiere];
+  const seuil = x.seuil;
 
-    if (estExpire(x)) {
-      classe = "expired";
-    } 
-    else if (seuil !== undefined && total <= seuil) {
-      classe = "stock-critique";
-    }
+  if (estExpire(x)) {
+    classe = "expired";
+  } 
+  else if (seuil !== undefined && total <= seuil) {
+    classe = "stock-critique";
+  }
 
-    tableStock.innerHTML += `
-      <tr class="${classe}">
-        <td>${x.matiere}</td>
-        <td>${x.fournisseur}</td>
-        <td>${x.lot}</td>
-        <td>${x.date || ""}</td>
-        <td>${x.sacs}</td>
-        <td>
-          <input type="number" id="sortie-${i}" style="width:50px">
-          <button onclick="validerSortie(${i})">✔️</button>
-          <button onclick="editerStock(${i})" title="Modifier">✏️</button>
-          <button onclick="supprimerStock(${i})" title="Supprimer">🗑️</button>
-        </td>
-      </tr>
-    `;
-  });
+  tableStock.innerHTML += `
+    <tr class="${classe}">
+      <td>${x.matiere}</td>
+      <td>${x.fournisseur}</td>
+      <td>${x.lot}</td>
+      <td>${x.date || ""}</td>
+      <td>${x.sacs}</td>
+      <td>
+        <input type="number" id="sortie-${i}" style="width:50px">
+        <button onclick="validerSortie(${i})">✔️</button>
+        <button onclick="editerStock(${i})">✏️</button>
+        <button onclick="supprimerStock(${i})">🗑️</button>
+      </td>
+    </tr>
+  `;
+});
+
 
   afficherSortiesMois();
 }
