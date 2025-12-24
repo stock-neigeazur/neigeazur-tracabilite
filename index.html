@@ -684,7 +684,7 @@ if (seuilAuto === undefined) {
     type: type.value,
     date: dlc.value,
     sacs: Number(quantite.value),
-    seuil: Number(seuil.value) || 0
+    seuil: seuilsParMatiere[matiere] ?? 0
   });
 }
 
