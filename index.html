@@ -851,14 +851,6 @@ function ecouterFirebase() {
   });
 }
 
-fournisseur.addEventListener("change", () => {
-  fournisseurAutre.style.display = fournisseur.value === "Autre" ? "block" : "none";
-});
-
-matiere.addEventListener("change", () => {
-  matiereAutre.style.display = matiere.value === "Autre" ? "block" : "none";
-});
-
 function openSection(section) {
   console.log("OPEN SECTION:", section);
 
