@@ -807,20 +807,17 @@ async function chargerDonneesFirebase() {
     sortiesMois = data.sortiesMois || [];
     historiqueMois = data.historiqueMois || [];
     moisActuel = data.moisActuel ?? new Date().getMonth();
-  } else {
-    await setDoc(ref, {
-      stock: [],
-      sortiesMois: [],
-      historiqueMois: [],
-      moisActuel: new Date().getMonth(),
-      updatedAt: new Date()
-    });
   }
-nettoyerHistoriqueOrphelin();
+
+  // 🔥 NETTOYAGE DEFINITIF
+  nettoyerHistoriqueOrphelin();
+
+  await save(); // ⬅️ ÉCRIT LE NETTOYAGE EN BASE
 
   afficher();
   afficherSortiesMois();
 }
+
 
 function ecouterFirebase() {
   const ref = doc(window.db, "neigeazur", "data");
@@ -1176,18 +1173,14 @@ Lot : ${lot.lot || "SANS LOT"}
 window.editerStock = editerStock;
 window.supprimerStock = supprimerStock;
 
- function nettoyerHistoriqueOrphelin() {
+function nettoyerHistoriqueOrphelin() {
   const idsValides = sortiesMois.map(s => s.id);
 
   historiqueMois = historiqueMois.filter(h =>
     h.id && idsValides.includes(h.id)
   );
 }
-function nettoyerHistoriqueFantome() {
-  const ids = sortiesMois.map(s => s.id);
-  historiqueMois = historiqueMois.filter(h => ids.includes(h.id));
-}
-nettoyerHistoriqueFantome();
+
 
 
 </script>
