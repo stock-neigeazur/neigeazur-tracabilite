@@ -360,7 +360,7 @@ button:active,
     </select>
     <input id="dlc" type="date">
     <input id="quantite" type="number" placeholder="Quantité (sacs)">
-    <input id="seuil" type="number" placeholder="Seuil d’alerte">
+    <input id="seuil" type="number" placeholder="Seuil d’alerte" style="display:none">
   </div>
 
 </div>
@@ -671,6 +671,10 @@ if (categorie.value === "mp") {
     alert("Champs incomplets");
     return;
   }
+const seuilAuto = seuilsParMatiere[matiere];
+if (seuilAuto === undefined) {
+  console.warn("⚠️ Aucun seuil défini pour", matiere);
+}
 
   stock.unshift({
     categorie: "MP",
