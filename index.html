@@ -766,9 +766,23 @@ if ((x.seuil === undefined || x.seuil === 0) && seuilsParMatiere[x.matiere]) {
 
 if (estExpire(x)) {
   classe = "expired";
-} else if (x.sacs <= x.seuil) {
+}
+  let classe = "";
+
+// 🔥 SEUIL AUTOMATIQUE PRIORITAIRE
+const seuilAuto = seuilsParMatiere[x.matiere];
+
+// si un seuil auto existe → on l’impose
+if (seuilAuto !== undefined) {
+  x.seuil = seuilAuto;
+}
+
+if (estExpire(x)) {
+  classe = "expired";
+} else if (x.seuil !== undefined && x.sacs <= x.seuil) {
   classe = "stock-critique";
 }
+
 
   tableStock.innerHTML += `
     <tr class="${classe}">
