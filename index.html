@@ -924,9 +924,30 @@ categorie.addEventListener("change", () => {
   blocMP.style.display = "none";
   blocMS.style.display = "none";
 
-  if (categorie.value === "mp") {
-    blocMP.style.display = "block";
-  }
+if (categorie.value === "mp") {
+
+  let nomMatiere = matiere.value === "Autre"
+    ? matiereAutre.value
+    : matiere.value;
+
+  let nomFournisseur = fournisseur.value === "Autre"
+    ? fournisseurAutre.value
+    : fournisseur.value;
+
+  if (!nomMatiere || !nomFournisseur || !quantite.value) return;
+
+  stock.unshift({
+    categorie: "MP",
+    matiere: nomMatiere,
+    fournisseur: nomFournisseur,
+    lot: lot.value || "SANS LOT",
+    type: type.value,
+    date: dlc.value,
+    sacs: Number(quantite.value),
+    seuil: Number(seuil.value) || 0
+  });
+}
+
 
   if (categorie.value === "ms") {
     blocMS.style.display = "block";
