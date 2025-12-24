@@ -750,90 +750,52 @@ window.ajouterLot = ajouterLot;
 window.validerSortie = validerSortie;
 window.showTab = showTab;
  
-function afficher(){
+function afficher() {
 
   if (!tableStock) return;
 
   tableStock.innerHTML = "";
 
- stock.forEach((x,i)=>{
- let classe = "";
+  // 🔢 Calcul du total par matière
+  const totalParMatiere = {};
+  stock.forEach(lot => {
+    totalParMatiere[lot.matiere] =
+      (totalParMatiere[lot.matiere] || 0) + lot.sacs;
+  });
 
-// 🔥 INJECTION DU SEUIL AUTO SI MANQUANT
-if ((x.seuil === undefined || x.seuil === 0) && seuilsParMatiere[x.matiere]) {
-  x.seuil = seuilsParMatiere[x.matiere];
-}
+  // 📦 Affichage du stock
+  stock.forEach((x, i) => {
+    let classe = "";
 
-if (estExpire(x)) {
-  classe = "expired";
-}
-  
-stock.forEach((x,i)=>{
-  let classe = "";
+    const total = totalParMatiere[x.matiere];
+    const seuil = x.seuil;
 
-  // 🔥 SEUIL AUTOMATIQUE PRIORITAIRE
-  const seuilAuto = seuilsParMatiere[x.matiere];
-  if (seuilAuto !== undefined) {
-    x.seuil = seuilAuto;
-  }
+    if (estExpire(x)) {
+      classe = "expired";
+    } 
+    else if (seuil !== undefined && total <= seuil) {
+      classe = "stock-critique";
+    }
 
-  if (estExpire(x)) {
-    classe = "expired";
-  } else if (x.seuil !== undefined && x.sacs <= x.seuil) {
-    classe = "stock-critique";
-  }
-
-  tableStock.innerHTML += `
-    <tr class="${classe}">
-      <td>${x.matiere}</td>
-      <td>${x.fournisseur}</td>
-      <td>${x.lot}</td>
-      <td>${x.date}</td>
-      <td>${x.sacs}</td>
-      <td>
-        <input type="number" id="sortie-${i}" style="width:50px">
-        <button onclick="validerSortie(${i})">✔️</button>
-        <button onclick="editerStock(${i})">✏️</button>
-        <button onclick="supprimerStock(${i})">🗑️</button>
-      </td>
-    </tr>
-  `;
-});
-
-// si un seuil auto existe → on l’impose
-if (seuilAuto !== undefined) {
-  x.seuil = seuilAuto;
-}
-
-if (estExpire(x)) {
-  classe = "expired";
-} else if (x.seuil !== undefined && x.sacs <= x.seuil) {
-  classe = "stock-critique";
-}
-
-
-  tableStock.innerHTML += `
-    <tr class="${classe}">
-      <td>${x.matiere}</td>
-      <td>${x.fournisseur}</td>
-      <td>${x.lot}</td>
-      <td>${x.date}</td>
-      <td>${x.sacs}</td>
-      <td>
-  <input type="number" id="sortie-${i}" style="width:50px">
-  <button onclick="validerSortie(${i})">✔️</button>
-  <button onclick="editerStock(${i})" title="Modifier">✏️</button>
-  <button onclick="supprimerStock(${i})" title="Supprimer">🗑️</button>
-</td>
-    </tr>
-  `;
-});
-
+    tableStock.innerHTML += `
+      <tr class="${classe}">
+        <td>${x.matiere}</td>
+        <td>${x.fournisseur}</td>
+        <td>${x.lot}</td>
+        <td>${x.date || ""}</td>
+        <td>${x.sacs}</td>
+        <td>
+          <input type="number" id="sortie-${i}" style="width:50px">
+          <button onclick="validerSortie(${i})">✔️</button>
+          <button onclick="editerStock(${i})" title="Modifier">✏️</button>
+          <button onclick="supprimerStock(${i})" title="Supprimer">🗑️</button>
+        </td>
+      </tr>
+    `;
+  });
 
   afficherSortiesMois();
 }
-
-
 
 
 function afficherSortiesMois() {
@@ -1021,6 +983,9 @@ function openSection(section) {
   if (section === "stats") {
     calculerStats();
   }
+ if (section === "stock") {
+  afficher();
+}
 }
 
 window.openSection = openSection;
