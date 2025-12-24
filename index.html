@@ -758,19 +758,18 @@ function afficher() {
   const totalParMatiere = stockParMatiere();
 
   stock.forEach((x, i) => {
-    let classe = "stock-ok";
+    let classe = "";
 
-    const seuil = seuilsParMatiere[x.matiere];
-    const total = totalParMatiere[x.matiere] || 0;
-
+    // 🔴 Péremption prioritaire
     if (estExpire(x)) {
       classe = "expired";
-    }
-    else if (seuil !== undefined && total <= seuil) {
-      classe = "stock-critique"; // 🔴
-    }
-    else if (seuil !== undefined && total <= seuil * 2) {
-      classe = "stock-warning"; // 🟠
+    } 
+    // 🔔 Alerte seuil GLOBAL par matière
+    else if (
+      seuils[x.matiere] !== undefined &&
+      totalParMatiere[x.matiere] <= seuils[x.matiere]
+    ) {
+      classe = "stock-critique";
     }
 
     tableStock.innerHTML += `
@@ -778,7 +777,7 @@ function afficher() {
         <td>${x.matiere}</td>
         <td>${x.fournisseur}</td>
         <td>${x.lot}</td>
-        <td>${x.date}</td>
+        <td>${x.date || ""}</td>
         <td>${x.sacs}</td>
         <td>
           <input type="number" id="sortie-${i}" style="width:50px">
