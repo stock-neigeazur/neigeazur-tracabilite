@@ -757,13 +757,18 @@ function afficher(){
   tableStock.innerHTML = "";
 
  stock.forEach((x,i)=>{
-  let classe = "";
+ let classe = "";
 
-  if(estExpire(x)){
-    classe = "expired";
-  } else if(x.sacs <= (x.seuil || 0)){
-    classe = "stock-critique";
-  }
+// 🔥 INJECTION DU SEUIL AUTO SI MANQUANT
+if ((x.seuil === undefined || x.seuil === 0) && seuilsParMatiere[x.matiere]) {
+  x.seuil = seuilsParMatiere[x.matiere];
+}
+
+if (estExpire(x)) {
+  classe = "expired";
+} else if (x.sacs <= x.seuil) {
+  classe = "stock-critique";
+}
 
   tableStock.innerHTML += `
     <tr class="${classe}">
