@@ -1011,21 +1011,30 @@ fournisseurMS.addEventListener("change", () => {
 });
  
 function resetAjoutStock() {
-  // reset selects
-  document.getElementById("categorie").value = "";
-  document.getElementById("matiere").value = "";
-  document.getElementById("fournisseur").value = "";
+  // reset catégorie
+  const categorie = document.getElementById("categorie");
+  categorie.value = "";
 
-  // reset inputs
+  // reset MP
+  document.getElementById("fournisseurMP").value = "";
   document.getElementById("lot").value = "";
   document.getElementById("dlc").value = "";
   document.getElementById("quantite").value = "";
   document.getElementById("seuil").value = "";
 
-  // cacher tous les blocs conditionnels
+  // reset MS
+  document.getElementById("fournisseurMS").value = "";
+  document.getElementById("quantiteMS").value = "";
+  document.getElementById("seuilMS").value = "";
+
+  // cacher uniquement les sous-blocs
   document.getElementById("bloc-mp").style.display = "none";
   document.getElementById("bloc-ms").style.display = "none";
+
+  document.getElementById("champs-mp").style.display = "none";
+  document.getElementById("champs-ms").style.display = "none";
 }
+
  function afficherHistorique() {
   const tbody = document.getElementById("tableHistorique");
   if (!tbody) return;
